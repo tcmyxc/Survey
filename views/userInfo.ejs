@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <% include ./components/headElements.html %>
+    <style type="text/css">
+        .show-grid{
+            background-color: rgba(86,61,124,.15);
+            border: 1px solid rgba(86,61,124,.2);
+            padding-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <% include ./components/header.html %>
+    <div class="container-fluid">
+        <div class="row">
+            <% include ./components/sidebar.html %>
+            <!-- 网站主要内容存放的地方 -->
+            <div class="col-xs-9 col-xs-offset-3 col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+                <h1 class="page-header">个人信息</h1>
+                <div class="row">
+                    <div class="col-xs-9 col-sm-9 col-md-10">
+                        <dl class="dl-horizontal">
+                          <dt>用户名：</dt><dd><%=userName %></dd>
+                          <dt>邮箱：</dt><dd><%=email %></dd>
+                        </dl>
+                    </div>
+                    <div class="col-xs-9 col-sm-4 col-md-4 show-grid">
+                        <h3>修改个人信息</h3>
+                        <form>
+                          <div class="form-group">
+                            <label for="email">邮箱</label>
+                            <input type="email" class="form-control" id="email" placeholder="<%=email %>">
+                          </div>
+                          <div class="form-group">
+                            <label for="password">密码</label>
+                            <input type="password" class="form-control" id="password" placeholder="Password">
+                          </div>
+                          <button type="submit" class="btn btn-default">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

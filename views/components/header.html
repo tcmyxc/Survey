@@ -1,5 +1,5 @@
-<!-- 网页头部 -->
-<nav class="navbar navbar-inverse navbar-fixed-top">
+<%# 网页头部 %>
+<div class="navbar navbar-inverse navbar-fixed-top">
     <div class="container-fluid">
         <div class="navbar-header">
             <a class="navbar-brand" href="/">问卷网站</a>
@@ -12,15 +12,18 @@
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
                 <li class="dropdown">
+                    <!-- 下面这个a标签只是想用它的样式，url不用给 -->
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">用户名<span class="caret"></span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="#"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;个人信息</a></li>
-                        <li><a href="#"><span class="glyphicon glyphicon-off" aria-hidden="true"></span>&nbsp;登出</a></li>
+                        <!-- 下面这四个URL后期要给 -->
+                        <!-- 2020-03-13 URL已给 -->
+                        <li><a href="/userInfo"><span class="glyphicon glyphicon-user" aria-hidden="true"></span>&nbsp;个人信息</a></li>
+                        <li><a href="/logout"><span class="glyphicon glyphicon-off" aria-hidden="true"></span>&nbsp;登出</a></li>
                     </ul>
                 </li>
-                <li><a href="#">帮助</a></li>
-                <li><a href="#">联系我们</a></li>
+                <li><a href="/help">帮助</a></li>
+                <li><a href="/contact">联系我们</a></li>
             </ul>
         </div>
     </div>
-</nav>
+</div>
