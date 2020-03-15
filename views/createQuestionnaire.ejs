@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <% include ./components/headElements.html %>
+</head>
+
+<body>
+
+    <% include ./components/header.html %>
+
+    <div class="container-fluid">
+        <div class="row">
+            <% include ./components/sidebar.html %>
+            <!-- 网站主要内容存放的地方 -->
+            <div class="col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 main">
+                <h1 class="page-header">问卷网站</h1>
+                <div class="col-sm-6 col-sm-offset-2 col-md-6 col-md-offset-2" style="border: 1px solid rgba(86,61,124,.2); margin-bottom: 10px;">
+                    <h1 class="text-center"><%=questionnaireTitle %></h1>
+                    <p><%=questionnaireDesc %></p><hr>
+                </div>
+                <br>
+                <div class="col-sm-6 col-sm-offset-2 col-md-6 col-md-offset-2" style="text-align: center;">
+                    <button type="button" class="btn btn-default">
+                      <span class="glyphicon glyphicon-plus" aria-hidden="true">&nbsp;添加题目</span>
+                    </button>
+                    <button type="button" class="btn btn-default">
+                      <span class="glyphicon glyphicon-ok" aria-hidden="true">&nbsp;保存文卷</span>
+                    </button>
+                    <button type="button" class="btn btn-default">
+                      <span class="glyphicon glyphicon-play-circle" aria-hidden="true">&nbsp;发布问卷</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</body>
+
+<script type="text/javascript">
+    
+</script>
+
+</html>

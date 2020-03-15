@@ -29,16 +29,36 @@ router.get('/contact', function(req, res, next) {
 
 //个人信息
 router.get('/userInfo', function(req, res, next) {
-    res.render('../views/userInfo', { 
-    	title: "个人信息",
-    	userName: "tcmyxc",
-    	email: "tcmyxc@163.com"
-    	 });
+    res.render('../views/userInfo', {
+        title: "个人信息",
+        userName: "tcmyxc",
+        email: "tcmyxc@163.com"
+    });
+});
+
+//修改个人信息
+router.post('/userInfo', function(req, res, next) {
+    console.log(req.body);
+    res.redirect('/userInfo');
 });
 
 //登出
 router.get('/logout', function(req, res, next) {
-	res.send("<script>alert('登出成功！即将跳转到网站主页'); window.location.href='/';</script>");
+    res.send("<script>alert('登出成功！即将跳转到网站主页'); window.location.href='/';</script>");
 });
 
+//创建表单
+router.get('/createQuestionnaire', function(req, res, next) {
+    console.log(req.body);
+    res.render('../views/createQuestionnaire', { title: "创建表单" });
+});
+
+router.post('/createQuestionnaire', function(req, res, next) {
+    console.log(req.body);
+    res.render('../views/createQuestionnaire', { 
+        title: "创建表单",
+        questionnaireTitle: req.body.questionnaireTitle,
+        questionnaireDesc: req.body.questionnaireDesc
+         });
+});
 module.exports = router;
