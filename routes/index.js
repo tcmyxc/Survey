@@ -50,15 +50,19 @@ router.get('/logout', function(req, res, next) {
 //创建表单
 router.get('/createQuestionnaire', function(req, res, next) {
     console.log(req.body);
-    res.render('../views/createQuestionnaire', { title: "创建表单" });
+    res.render('../views/createQuestionnaire', {
+        title: "创建表单",
+        questionnaireTitle: req.body.questionnaireTitle,
+        questionnaireDesc: req.body.questionnaireDesc
+    });
 });
 
 router.post('/createQuestionnaire', function(req, res, next) {
     console.log(req.body);
-    res.render('../views/createQuestionnaire', { 
+    res.render('../views/createQuestionnaire', {
         title: "创建表单",
         questionnaireTitle: req.body.questionnaireTitle,
         questionnaireDesc: req.body.questionnaireDesc
-         });
+    });
 });
 module.exports = router;
