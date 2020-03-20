@@ -6,9 +6,7 @@
 </head>
 
 <body>
-
     <% include ./components/header.html %>
-
     <div class="container-fluid">
         <div class="row">
             <% include ./components/sidebar.html %>
@@ -16,77 +14,27 @@
             <div class="col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 main">
                 <h1 class="page-header">问卷网站</h1>
                 <% if(questionnaireTitle && questionnaireDesc) { %>
-                    <div class="col-sm-6 col-sm-offset-2 col-md-6 col-md-offset-2" style="border: 1px solid rgba(86,61,124,.2); margin-bottom: 10px;">
-                        <h1 class="text-center"><%=questionnaireTitle %></h1>
-                        <p><%=questionnaireDesc %></p><hr>
-                    </div>
-
-                    <br>
-                    <%# 三个功能按钮 %>
-                    <div class="col-sm-6 col-sm-offset-2 col-md-6 col-md-offset-2" style="text-align: center;">
-                        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addQuestion">
-                          <span class="glyphicon glyphicon-plus" aria-hidden="true">&nbsp;添加题目</span>
-                        </button>
-                        <button type="button" class="btn btn-default">
-                          <span class="glyphicon glyphicon-ok" aria-hidden="true">&nbsp;保存文卷</span>
-                        </button>
-                        <button type="button" class="btn btn-default">
-                          <span class="glyphicon glyphicon-play-circle" aria-hidden="true">&nbsp;发布问卷</span>
-                        </button>
-                    </div>
+                <div class="col-sm-6 col-sm-offset-2 col-md-6 col-md-offset-2" style="border: 1px solid rgba(86,61,124,.2); margin-bottom: 10px;">
+                    <h1 class="text-center">
+                        <%=questionnaireTitle %>
+                    </h1>
+                    <p>
+                        <%=questionnaireDesc %>
+                    </p>
+                    <hr>
+                </div>
+                <br>
                 <% } %>
 
-                <%# 下面的部分被舍弃
-                <div class="form-horizontal" id="addQuestionForm">
-                    <div class="form-group">
-                        <label for="questionType">问题类型：</label>
-                        <select class="form-control" name="questionType" id="questionType" placeholder="请选择题目类型">
-                            <option value="1">单选</option>
-                            <option value="2">单选（打分形式）</option>
-                            <option value="3">多选</option>
-                            <option value="4">填空（文本形式）</option>
-                            <option value="5">填空（数字形式）</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="questionMust">是否必填：</label>
-                        <input type="checkbox" name="questionMust" id="questionMust" checked="checked"/>
-                    </div>
-                    <div class="form-group" id="subQuestionTitleDiv">
-                        <label for="subQuestionDesc">问题描述：</label>
-                        <textarea rows="2" class="form-control" id="subQuestionDesc" name="subQuestionDesc" placeholder="请输入问题描述" required></textarea>
-                    </div>
-
-                    <div id="addBtn">
-                        <button v-on:click="addOption">
-                            <span class="glyphicon glyphicon-plus">&nbsp;添加选项</span>
-                        </button>
-                        <p>&nbsp;</p>
-
-                        <div v-for="(index,option) in options">
-                            <div>
-                                <input type="text" v-model="option.content">
-                                <button v-on:click="deleteOption(index,option)">删除</button><br><br>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                结束 %>
-
-                <%# addQuestionModal %>
-                <div class="modal fade" id="addQuestion" tabindex="-1" role="dialog" aria-labelledby="addQuestionModalTitle">
-                  <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                      <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h4 class="modal-title" id="addQuestionModalTitle">添加题目</h4>
-                      </div>
-                      <div class="modal-body" style="margin: 15px;">
-                        <div class="form-horizontal" id="addQuestionForm">
+                <%# 隐藏面板 %>
+                <div id="addQuestion" class="col-sm-6 col-sm-offset-2 col-md-6 col-md-offset-2" style="display: none;">
+                    <div class="modal-body" style="margin: 15px;">
+                        <%# 下面的使用了vue语法 %>
+                        <form class="form-horizontal" id="addQuestionForm" method="post" action="/createQuestionnaire">
                             <div class="form-group">
                                 <label for="questionType">问题类型：</label>
-                                <select class="form-control" name="questionType" id="questionType" placeholder="请选择题目类型" v-model="questionType">
+                                <select class="form-control" name="questionType" id="questionType">
+                                    <option value="0" disabled selected hidden>请选择问题类型</option>
                                     <option value="1">单选</option>
                                     <option value="2">单选（打分形式）</option>
                                     <option value="3">多选</option>
@@ -96,98 +44,83 @@
                             </div>
                             <div class="form-group">
                                 <label for="questionMust">是否必填：</label>
-                                <input type="checkbox" name="questionMust" id="questionMust" checked="checked" v-model="questionMust"/>
+                                <input type="checkbox" name="questionMust" id="questionMust" checked="checked" />
                             </div>
                             <div class="form-group" id="subQuestionTitleDiv">
                                 <label for="subQuestionDesc">问题描述：</label>
-                                <textarea rows="2" class="form-control" id="subQuestionDesc" name="subQuestionDesc" placeholder="请输入问题描述" v-model="subQuestionDesc" required></textarea>
+                                <textarea rows="2" class="form-control" id="subQuestionDesc" name="subQuestionDesc" placeholder="请输入问题描述" required></textarea>
                             </div>
-
-                            <div>
-                                <button v-on:click="addOption">
-                                    <span class="glyphicon glyphicon-plus">&nbsp;添加选项</span>
-                                </button>
+                            <%# 添加的是普通单选或者多选 %>
+                            <div id="qType13" style="display: none;">
+                                <span class="glyphicon glyphicon-plus btn btn-default">&nbsp;添加选项</span>
                                 <p>&nbsp;</p>
-
-                                <div v-for="(index,option) in options">
                                     <div>
-                                        <input type="text" v-model="option.content">
-                                        <button v-on:click="deleteOption(index,option)">删除</button><br><br>
+                                        <input type="text">
+                                        <button>删除</button><br><br>
                                     </div>
-                                </div>
                             </div>
-
-                        </div>
-                      </div>
-                      <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                        <!-- <button type="button" class="btn btn-primary">Submit</button> -->
-                        <button type="button" class="btn btn-primary" onclick="verifyQuestionDesc()">Submit</button>
-                      </div>
+                            <%# 添加的是打分形式单选 %>
+                            <div id="qType2" style="display: none;">
+                                请输入分级：<input type="number" name="radioLevel" id="radioLevel" max="5" min="2" placeholder="2-5">
+                            </div>
+                            </from>
                     </div>
-                  </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" onclick="verifyQuestionDesc()">Submit</button>
+                    </div>
                 </div>
-                <%# end Modal %>
+
+                <%# 三个功能按钮 %>
+                <div class="col-sm-6 col-sm-offset-2 col-md-6 col-md-offset-2" style="text-align: center;">
+                    <button type="button" class="btn btn-default" id="addQuestionBtn">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true">&nbsp;添加题目</span>
+                    </button>
+                    <button type="button" class="btn btn-default">
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true">&nbsp;保存问卷</span>
+                    </button>
+                    <button type="button" class="btn btn-default">
+                        <span class="glyphicon glyphicon-play-circle" aria-hidden="true">&nbsp;发布问卷</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-    
 </body>
-
 <script type="text/javascript">
-    var vm = new Vue({
-        el: "#addQuestionForm",
-        data: {
-            question: {},
-            options: [{
-                content: ""
-            }],
-            errorMessage: '',
-            saving: false
-        },
-        methods: {
-            addOption: function () {
-                this.options.push({
-                    content: ''
-                });
-            },
-            deleteOption: function (index, option){
-                this.options.splice(index, 1);
-                return;
-            }
+    // 添加问题按钮
+    $("#addQuestionBtn").click(function() {
+        $("#addQuestion").css("display", "inline");
+    });
+
+    // 选择问题类型
+    $("#questionType").click(function() {
+        //console.log($("#questionType").val());
+        $("#qType2").css("display", "none");
+        $("#qType13").css("display", "none");
+        var questionType = $("#questionType").val();
+        if(questionType == "2"){
+            $("#qType2").css("display", "inline");
+        }
+        else if(questionType == "1" || questionType == "3"){
+            $("#qType13").css("display", "inline");
         }
     });
+
+    // 验证一些必要信息
+    function verifyQuestionDesc() {
+        if($("#questionType") == "0"){
+            alert("请选择问题类型！");
+            return;
+        }
+        else if ($("#subQuestionDesc").val() == "") {
+            alert("问题描述不能为空！");
+            return;
+        }       
+        else {
+            $("#addQuestionForm").submit();
+        }
+    };
+
 </script>
-
-<!-- <script type="text/javascript">
-    $(function(){
-        $("#questionType").focus(function(){
-            //alert($("#questionType").val());
-            var qType = $("#questionType").val();
-            var index = 0;
-            if(qType =="单选1"){
-                index++;
-                var txt = '<div class="form-group"><label>选项' + (index) + '：</label><input type="text" class="form-control" placeholder="请输入选项名"></div>';
-                $("#addQuestionForm").append(txt);
-            }
-            else if(qType =="单选2"){
-
-            }
-            else if(qType =="多选"){
-
-            }
-            else if(qType =="填空1"){
-
-            }
-            else if(qType =="填空2"){
-
-            }
-            else{
-                alert("你好像想搞事情!");
-                return;
-            }
-        })
-    });
-</script> -->
 
 </html>

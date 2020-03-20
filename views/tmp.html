@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <% include ./components/headElements.html %>
+</head>
+
+<body>
+    <% include ./components/header.html %>
+    <div class="container-fluid">
+        <div class="row">
+            <% include ./components/sidebar.html %>
+            <!-- 网站主要内容存放的地方 -->
+            <div class="col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 main">
+                <h1 class="page-header">问卷网站</h1>
+                <% if(questionnaireTitle && questionnaireDesc) { %>
+                <div class="col-sm-6 col-sm-offset-2 col-md-6 col-md-offset-2" style="border: 1px solid rgba(86,61,124,.2); margin-bottom: 10px;">
+                    <h1 class="text-center">
+                        <%=questionnaireTitle %>
+                    </h1>
+                    <p>
+                        <%=questionnaireDesc %>
+                    </p>
+                    <hr>
+                </div>
+                <br>
+                <%# 三个功能按钮 %>
+                <div class="col-sm-6 col-sm-offset-2 col-md-6 col-md-offset-2" style="text-align: center;">
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addQuestion">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true">&nbsp;添加题目</span>
+                    </button>
+                    <button type="button" class="btn btn-default">
+                        <span class="glyphicon glyphicon-ok" aria-hidden="true">&nbsp;保存文卷</span>
+                    </button>
+                    <button type="button" class="btn btn-default">
+                        <span class="glyphicon glyphicon-play-circle" aria-hidden="true">&nbsp;发布问卷</span>
+                    </button>
+                </div>
+                <% } %>
+                <%# addQuestionModal %>
+                <div class="modal fade" id="addQuestion" tabindex="-1" role="dialog" aria-labelledby="addQuestionModalTitle">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <h4 class="modal-title" id="addQuestionModalTitle">添加题目</h4>
+                            </div>
+                            <div class="modal-body" style="margin: 15px;">
+                                <%# 下面的使用了vue语法 %>
+                                <form class="form-horizontal" id="addQuestionForm" method="post" action="/createQuestionnaire">
+                                    <div class="form-group">
+                                        <label for="questionType">问题类型：</label>
+                                        <select class="form-control" name="questionType" id="questionType" placeholder="请选择题目类型" v-model="questionType">
+                                            <option value="1">单选</option>
+                                            <option value="2">单选（打分形式）</option>
+                                            <option value="3">多选</option>
+                                            <option value="4">填空（文本形式）</option>
+                                            <option value="5">填空（数字形式）</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="questionMust">是否必填：</label>
+                                        <input type="checkbox" name="questionMust" id="questionMust" checked="checked" />
+                                    </div>
+                                    <div class="form-group" id="subQuestionTitleDiv">
+                                        <label for="subQuestionDesc">问题描述：</label>
+                                        <textarea rows="2" class="form-control" id="subQuestionDesc" name="subQuestionDesc" placeholder="请输入问题描述" v-model="subQuestionDesc" required></textarea>
+                                    </div>
+                                    <%# 添加的是普通单选或者多选 %>
+                                    <div v-if="questionType =='1' || questionType =='3'">
+                                        <span class="glyphicon glyphicon-plus btn btn-default" v-on:click="addOption">&nbsp;添加选项</span>
+                                        <p>&nbsp;</p>
+                                        <div v-for="(index,option) in options">
+                                            <div>
+                                                <input type="text" v-model="option.content">
+                                                <button v-on:click="deleteOption(index,option)">删除</button><br><br>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <%# 添加的是打分形式单选 %>
+                                    <div v-if="questionType =='2'">
+                                        请输入分级：<input type="number" name="radioLevel" id="radioLevel" max="5" min="2" placeholder="2-5" v-model="radioLevel">
+                                    </div>
+                                    </from>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                <!-- <button type="button" class="btn btn-primary">Submit</button> -->
+                                <!-- <button type="button" class="btn btn-primary" onclick="verifyQuestionDesc()">Submit</button> -->
+                                <button type="button" class="btn btn-primary" onclick="verifyQuestionDesc()">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <%# end Modal %>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+var vm = new Vue({
+    el: "#addQuestion",
+    data: {
+        questionType: [],
+        questionMust: "on",
+        subQuestionDesc: "",
+        radioLevel: "",
+        options: [{
+            content: "12345"
+        }],
+        saving: false
+    },
+    methods: {
+        // 添加选项
+        addOption: function() {
+            this.options.push({
+                content: ""
+            });
+        },
+
+        // 删除选项
+        deleteOption: function(index, option) {
+            this.options.splice(index, 1);
+            return;
+        }
+    }
+});
+</script>
+<script type="text/javascript">
+function verifyQuestionDesc() {
+    var radioLevel = $("#radioLevel").val();
+    var questionType = $("questionType")[0];
+    console.log(radioLevel);
+    console.log(questionType);
+
+    if ($("#subQuestionDesc").val() == "") {
+        alert("问题描述不能为空！");
+        return;
+    } else if (questionType == "2") {
+        if (!radioLevel) {
+            alert("分级不能为空！");
+            return;
+        }
+        else if(radioLevel>5 || radioLevel<2){
+            alert("分级应该在 2 到 5 之间！");
+            return;
+        }
+    } 
+    else {
+        $("#addQuestionForm").submit();
+    }
+};
+</script>
+
+</html>
