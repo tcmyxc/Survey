@@ -22,15 +22,39 @@
                         <%=questionnaireDesc %>
                     </p>
                     <hr>
+                    <% if(length>0) { %>
+                        <form>
+                            <% for(var i=0; i<length; i++){%>
+                                <div id="subq<%=i+1%>" class="form-group">
+                                    <% if(subQData[i].q_type == 1) { %>
+                                        <h4><%=i+1 %>.<%=subQData[i].q_desc %></h4>
+                                        <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
+                                        <% var options=JSON.parse(subQData[i].q_options) %>
+                                        <% for(var j=0; j<options.length; j++){ %>
+                                            <input type="radio" name="options"><%=options[j]  %>&nbsp;&nbsp;
+                                        <% } %>
+                                    <%}%>
+                                    <% if(subQData[i].q_type == 3) { %>
+                                        <h4><%=i+1 %>.<%=subQData[i].q_desc %></h4>
+                                        <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
+                                        <% var options=JSON.parse(subQData[i].q_options) %>
+                                        <% for(var j=0; j<options.length; j++){ %>
+                                            <input type="checkbox" name="options"><%=options[j]  %>&nbsp;&nbsp;
+                                        <% } %>
+                                    <%}%>
+                                    <hr>
+                                </div>
+                            <% } %> 
+                        </form>
+                    <% } %>
                 </div>
                 <br>
                 <% } %>
-
                 <%# 隐藏面板 %>
-                <div id="addQuestion" class="col-sm-6 col-sm-offset-2 col-md-6 col-md-offset-2" style="display: none;">
+                <div id="addQuestion" class="col-sm-6 col-sm-offset-2 col-md-6 col-md-offset-2" style="display: none; border: 1px solid rgba(86,61,124,.2); margin-bottom: 15px">
                     <div class="modal-body" style="margin: 15px;">
-                        <%# 下面的使用了vue语法 %>
-                        <form class="form-horizontal" id="addQuestionForm" method="post" action="/createQuestionnaire">
+                        <%# 下面的是表单 %>
+                        <form class="form-horizontal" id="addQuestionForm" method="post" action="/addQuestion">
                             <div class="form-group">
                                 <label for="questionType">问题类型：</label>
                                 <select class="form-control" name="questionType" id="questionType">
@@ -52,12 +76,11 @@
                             </div>
                             <%# 添加的是普通单选或者多选 %>
                             <div id="qType13" style="display: none;">
-                                <span class="glyphicon glyphicon-plus btn btn-default">&nbsp;添加选项</span>
+                                <span id="qType13btn" class="glyphicon glyphicon-plus btn btn-default">&nbsp;添加选项</span>
                                 <p>&nbsp;</p>
-                                    <div>
-                                        <input type="text">
-                                        <button>删除</button><br><br>
-                                    </div>
+                                <div>
+                                    <input type="text" name="options">
+                                </div>
                             </div>
                             <%# 添加的是打分形式单选 %>
                             <div id="qType2" style="display: none;">
@@ -69,7 +92,6 @@
                         <button type="button" class="btn btn-primary" onclick="verifyQuestionDesc()">Submit</button>
                     </div>
                 </div>
-
                 <%# 三个功能按钮 %>
                 <div class="col-sm-6 col-sm-offset-2 col-md-6 col-md-offset-2" style="text-align: center;">
                     <button type="button" class="btn btn-default" id="addQuestionBtn">
@@ -87,40 +109,48 @@
     </div>
 </body>
 <script type="text/javascript">
-    // 添加问题按钮
-    $("#addQuestionBtn").click(function() {
-        $("#addQuestion").css("display", "inline");
-    });
+// 添加问题按钮
+$("#addQuestionBtn").click(function() {
+    $("#addQuestion").css("display", "inline");
+});
 
-    // 选择问题类型
-    $("#questionType").click(function() {
-        //console.log($("#questionType").val());
-        $("#qType2").css("display", "none");
-        $("#qType13").css("display", "none");
-        var questionType = $("#questionType").val();
-        if(questionType == "2"){
-            $("#qType2").css("display", "inline");
-        }
-        else if(questionType == "1" || questionType == "3"){
-            $("#qType13").css("display", "inline");
-        }
-    });
+// 选择问题类型
+$("#questionType").click(function() {
+    //console.log($("#questionType").val());
+    $("#qType2").css("display", "none");
+    $("#qType13").css("display", "none");
+    var questionType = $("#questionType").val();
+    if (questionType == "2") {
+        $("#qType2").css("display", "inline");
+    } else if (questionType == "1" || questionType == "3") {
+        $("#qType13").css("display", "inline");
+    }
+});
 
-    // 验证一些必要信息
-    function verifyQuestionDesc() {
-        if($("#questionType") == "0"){
-            alert("请选择问题类型！");
-            return;
-        }
-        else if ($("#subQuestionDesc").val() == "") {
-            alert("问题描述不能为空！");
-            return;
-        }       
-        else {
-            $("#addQuestionForm").submit();
-        }
-    };
+// 单选或者多选
+$("#qType13btn").click(function() {
+    var html = '<br><div><input type="text" name="options"></div>';
+    $("#qType13").append(html);
+});
 
+// 验证一些必要信息
+function verifyQuestionDesc() {
+    //console.log($("#questionType").val());
+    if ($("#questionType").val() == null) {
+        alert("请选择问题类型！");
+        return;
+    }
+    if ($("#subQuestionDesc").val() == "") {
+        alert("问题描述不能为空！");
+        return;
+    }
+    if ($("#questionType").val() == "2" && $("#radioLevel").val() == "") {
+        alert("请输入分级！");
+        return;
+    }
+
+    $("#addQuestionForm").submit();
+};
 </script>
 
 </html>
