@@ -144,7 +144,7 @@ router.post('/addQuestion', function(req, res, next) {
 
     var qID = req.session.qID;
     var qType = req.body.questionType;
-    var qMust = req.body.questionMust ? 1: 0;
+    var qMust = (req.body.questionMust=='on') ? '1': '0';
     var qDesc = req.body.subQuestionDesc;
 
     if (qType == "1" || qType == "3") {
@@ -158,6 +158,29 @@ router.post('/addQuestion', function(req, res, next) {
                 res.redirect("/createQuestionnaire");
             }
         });
+    }
+    else if(qType == '2'){
+        var qLevel = req.body.radioLevel;
+        var sql = "insert into questions (questionnaire_id, q_type, q_must, q_desc, q_level) values (?,?,?,?,?)";
+        db.query(sql, [qID, qType, qMust, qDesc, qLevel], function(err, data) {
+            if (err) {
+                console.log(err);
+            } else {
+                res.redirect("/createQuestionnaire");
+            }
+        });
+
+    }
+    else if(qType == '4' || qType=='5'){
+        var sql = "insert into questions (questionnaire_id, q_type, q_must, q_desc) values (?,?,?,?)";
+        db.query(sql, [qID, qType, qMust, qDesc], function(err, data) {
+            if (err) {
+                console.log(err);
+            } else {
+                res.redirect("/createQuestionnaire");
+            }
+        });
+
     }
     else{
         res.redirect("/createQuestionnaire");

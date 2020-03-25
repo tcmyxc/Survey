@@ -42,6 +42,22 @@
                                             <input type="checkbox" name="options"><%=options[j]  %>&nbsp;&nbsp;
                                         <% } %>
                                     <%}%>
+                                    <% if(subQData[i].q_type == 2) { %>
+                                        <h4><%=i+1 %>.<%=subQData[i].q_desc %></h4>
+                                        <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
+                                        <% var levels=subQData[i].q_level %>
+                                        <% for(var j=0; j<levels; j++){ %>
+                                            <input type="radio"><%=j+1  %>&nbsp;&nbsp;
+                                        <% } %>
+                                    <%}%>
+                                    <% if(subQData[i].q_type == 4) { %>
+                                        <h4><%=i+1 %>.<%=subQData[i].q_desc %></h4>
+                                        <textarea class="form-control" rows="2" required></textarea>
+                                    <%}%>
+                                    <% if(subQData[i].q_type == 5) { %>
+                                        <h4><%=i+1 %>.<%=subQData[i].q_desc %></h4>
+                                        <input class="form-control" type="number">
+                                    <%}%>
                                     <hr>
                                 </div>
                             <% } %> 
@@ -97,10 +113,10 @@
                     <button type="button" class="btn btn-default" id="addQuestionBtn">
                         <span class="glyphicon glyphicon-plus" aria-hidden="true">&nbsp;添加题目</span>
                     </button>
-                    <button type="button" class="btn btn-default">
+                    <button type="button" class="btn btn-default" id="savaBtn">
                         <span class="glyphicon glyphicon-ok" aria-hidden="true">&nbsp;保存问卷</span>
                     </button>
-                    <button type="button" class="btn btn-default">
+                    <button type="button" class="btn btn-default" id="publishBtn">
                         <span class="glyphicon glyphicon-play-circle" aria-hidden="true">&nbsp;发布问卷</span>
                     </button>
                 </div>
