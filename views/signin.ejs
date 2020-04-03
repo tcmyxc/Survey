@@ -28,9 +28,9 @@
             <div class="main">
                 <h1 class="page-header text-center">欢迎来到问卷网站</h1>
                 <div class="col-sm-4 col-sm-offset-4 col-md-4 col-md-offset-4">
-                    <form class="form-group" method="post" action="/login">
-                        <h3 style="color: blue;">登录</h3>
-                        <div >
+                    <form class="form-group" method="post" action="/addUser">
+                        <h3 style="color: blue;">注册</h3>
+                        <div class="form-group">
                             <label for="username">用户名：</label>
                             <input id="username" type="text" name="username" class="form-control" required placeholder="不少于六个字节" minlength="6">
                         </div>
@@ -38,10 +38,12 @@
                             <label for="password">密码：</label>
                             <input id="password" type="password" name="password" class="form-control" required placeholder="不少于六个字节" minlength="6">
                         </div>  
+                        <div class="form-group">
+                            <label for="email">邮箱：</label>
+                            <input id="email" type="email" name="email" class="form-control" required>
+                        </div>
                         <div style="text-align: right;">   
-                            <button type="submit" class="btn btn-primary">登录</button>
-                            <button type="button" class="btn btn-default" id="signinBtn">注册</button>   
-                            <button type="button" class="btn btn-warning" id="findPWDBtn">忘记密码</button>
+                            <button type="submit" class="btn btn-default">注册</button>   
                         </div>           
                     </form>
                 </div>
@@ -49,15 +51,5 @@
         </div>
     </div>
 </body>
-
-<script type="text/javascript">
-    $('#signinBtn').click(function(){
-        window.location.href = "/signin";
-    });
-
-    $('#findPWDBtn').click(function(){
-        window.location.href = "/findPWD";
-    });
-</script>
 
 </html>

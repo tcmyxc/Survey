@@ -26,34 +26,41 @@
                         <form>
                             <% for(var i=0; i<length; i++){%>
                                 <div id="subq<%=i+1%>" class="form-group">
+                                    <%# 单选 %>
                                     <% if(subQData[i].q_type == 1) { %>
                                         <h4><%=i+1 %>.<%=subQData[i].q_desc %></h4>
                                         <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
                                         <% var options=JSON.parse(subQData[i].q_options) %>
                                         <% for(var j=0; j<options.length; j++){ %>
-                                            <input type="radio" name="options"><%=options[j]  %>&nbsp;&nbsp;
+                                            <%# 单选name要相同 %>
+                                            <input type="radio" name="options">&nbsp;<%=options[j]  %>&nbsp;&nbsp;
                                         <% } %>
                                     <%}%>
+                                    <%# 多选 %>
                                     <% if(subQData[i].q_type == 3) { %>
                                         <h4><%=i+1 %>.<%=subQData[i].q_desc %></h4>
                                         <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
                                         <% var options=JSON.parse(subQData[i].q_options) %>
                                         <% for(var j=0; j<options.length; j++){ %>
-                                            <input type="checkbox" name="options"><%=options[j]  %>&nbsp;&nbsp;
+                                            <input type="checkbox" name="options">&nbsp;<%=options[j]  %>&nbsp;&nbsp;
                                         <% } %>
                                     <%}%>
+                                    <%# 打分单选 %>
                                     <% if(subQData[i].q_type == 2) { %>
                                         <h4><%=i+1 %>.<%=subQData[i].q_desc %></h4>
                                         <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
                                         <% var levels=subQData[i].q_level %>
                                         <% for(var j=0; j<levels; j++){ %>
-                                            <input type="radio"><%=j+1  %>&nbsp;&nbsp;
+                                            <%# 单选name要相同 %>
+                                            <input type="radio" name="options">&nbsp;<%=j+1  %>&nbsp;&nbsp;
                                         <% } %>
                                     <%}%>
+                                    <%# 文本填空 %>
                                     <% if(subQData[i].q_type == 4) { %>
                                         <h4><%=i+1 %>.<%=subQData[i].q_desc %></h4>
                                         <textarea class="form-control" rows="2" required></textarea>
                                     <%}%>
+                                    <%# 数字填空 %>
                                     <% if(subQData[i].q_type == 5) { %>
                                         <h4><%=i+1 %>.<%=subQData[i].q_desc %></h4>
                                         <input class="form-control" type="number">
@@ -105,6 +112,7 @@
                             </from>
                     </div>
                     <div class="modal-footer">
+                        <button type="button" class="btn btn-default" onclick="closeMyModal()">Close</button>
                         <button type="button" class="btn btn-primary" onclick="verifyQuestionDesc()">Submit</button>
                     </div>
                 </div>
@@ -130,6 +138,11 @@ $("#addQuestionBtn").click(function() {
     $("#addQuestion").css("display", "inline");
 });
 
+// 发布问卷
+$("#publishBtn").click(function(){
+    window.location.href = "/publishQuestionnaire";
+});
+
 // 选择问题类型
 $("#questionType").click(function() {
     //console.log($("#questionType").val());
@@ -148,6 +161,11 @@ $("#qType13btn").click(function() {
     var html = '<br><div><input type="text" name="options"></div>';
     $("#qType13").append(html);
 });
+
+// 关闭添加问题的DIV
+function closeMyModal(){
+    $("#addQuestion").css("display", "none");
+};
 
 // 验证一些必要信息
 function verifyQuestionDesc() {

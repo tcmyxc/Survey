@@ -28,8 +28,8 @@
             <div class="main">
                 <h1 class="page-header text-center">欢迎来到问卷网站</h1>
                 <div class="col-sm-4 col-sm-offset-4 col-md-4 col-md-offset-4">
-                    <form class="form-group" method="post" action="/login">
-                        <h3 style="color: blue;">登录</h3>
+                    <form class="form-group" method="post" action="/findPWD">
+                        <h3 style="color: blue;">密码找回</h3>
                         <div >
                             <label for="username">用户名：</label>
                             <input id="username" type="text" name="username" class="form-control" required placeholder="不少于六个字节" minlength="6">
@@ -39,9 +39,7 @@
                             <input id="password" type="password" name="password" class="form-control" required placeholder="不少于六个字节" minlength="6">
                         </div>  
                         <div style="text-align: right;">   
-                            <button type="submit" class="btn btn-primary">登录</button>
-                            <button type="button" class="btn btn-default" id="signinBtn">注册</button>   
-                            <button type="button" class="btn btn-warning" id="findPWDBtn">忘记密码</button>
+                            <button type="submit" class="btn btn-default">提交</button>   
                         </div>           
                     </form>
                 </div>
@@ -49,15 +47,5 @@
         </div>
     </div>
 </body>
-
-<script type="text/javascript">
-    $('#signinBtn').click(function(){
-        window.location.href = "/signin";
-    });
-
-    $('#findPWDBtn').click(function(){
-        window.location.href = "/findPWD";
-    });
-</script>
 
 </html>
