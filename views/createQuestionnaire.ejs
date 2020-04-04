@@ -23,52 +23,70 @@
                     </p>
                     <hr>
                     <% if(length>0) { %>
-                        <form>
-                            <% for(var i=0; i<length; i++){%>
-                                <div id="subq<%=i+1%>" class="form-group">
-                                    <%# 单选 %>
-                                    <% if(subQData[i].q_type == 1) { %>
-                                        <h4><%=i+1 %>.<%=subQData[i].q_desc %></h4>
-                                        <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
-                                        <% var options=JSON.parse(subQData[i].q_options) %>
-                                        <% for(var j=0; j<options.length; j++){ %>
-                                            <%# 单选name要相同 %>
-                                            <input type="radio" name="options">&nbsp;<%=options[j]  %>&nbsp;&nbsp;
-                                        <% } %>
-                                    <%}%>
-                                    <%# 多选 %>
-                                    <% if(subQData[i].q_type == 3) { %>
-                                        <h4><%=i+1 %>.<%=subQData[i].q_desc %></h4>
-                                        <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
-                                        <% var options=JSON.parse(subQData[i].q_options) %>
-                                        <% for(var j=0; j<options.length; j++){ %>
-                                            <input type="checkbox" name="options">&nbsp;<%=options[j]  %>&nbsp;&nbsp;
-                                        <% } %>
-                                    <%}%>
-                                    <%# 打分单选 %>
-                                    <% if(subQData[i].q_type == 2) { %>
-                                        <h4><%=i+1 %>.<%=subQData[i].q_desc %></h4>
-                                        <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
-                                        <% var levels=subQData[i].q_level %>
-                                        <% for(var j=0; j<levels; j++){ %>
-                                            <%# 单选name要相同 %>
-                                            <input type="radio" name="options">&nbsp;<%=j+1  %>&nbsp;&nbsp;
-                                        <% } %>
-                                    <%}%>
-                                    <%# 文本填空 %>
-                                    <% if(subQData[i].q_type == 4) { %>
-                                        <h4><%=i+1 %>.<%=subQData[i].q_desc %></h4>
-                                        <textarea class="form-control" rows="2" required></textarea>
-                                    <%}%>
-                                    <%# 数字填空 %>
-                                    <% if(subQData[i].q_type == 5) { %>
-                                        <h4><%=i+1 %>.<%=subQData[i].q_desc %></h4>
-                                        <input class="form-control" type="number">
-                                    <%}%>
-                                    <hr>
-                                </div>
-                            <% } %> 
-                        </form>
+                    <form>
+                        <% for(var i=0; i<length; i++){%>
+                        <div id="subq<%=i+1%>" class="form-group">
+                            <%# 单选 %>
+                            <% if(subQData[i].q_type == 1) { %>
+                            <h4>
+                                <%=i+1 %>.
+                                <%=subQData[i].q_desc %>
+                            </h4>
+                            <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
+                            <% var options=JSON.parse(subQData[i].q_options) %>
+                            <% for(var j=0; j<options.length; j++){ %>
+                            <%# 单选name要相同 %>
+                            <input type="radio" name="options<%=i+1 %>">&nbsp;
+                            <%=options[j]  %>&nbsp;&nbsp;
+                            <% } %>
+                            <%}%>
+                            <%# 多选 %>
+                            <% if(subQData[i].q_type == 3) { %>
+                            <h4>
+                                <%=i+1 %>.
+                                <%=subQData[i].q_desc %>
+                            </h4>
+                            <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
+                            <% var options=JSON.parse(subQData[i].q_options) %>
+                            <% for(var j=0; j<options.length; j++){ %>
+                            <input type="checkbox" name="options<%=i+1 %>">&nbsp;
+                            <%=options[j]  %>&nbsp;&nbsp;
+                            <% } %>
+                            <%}%>
+                            <%# 打分单选 %>
+                            <% if(subQData[i].q_type == 2) { %>
+                            <h4>
+                                <%=i+1 %>.
+                                <%=subQData[i].q_desc %>
+                            </h4>
+                            <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
+                            <% var levels=subQData[i].q_level %>
+                            <% for(var j=0; j<levels; j++){ %>
+                            <%# 单选name要相同 %>
+                            <input type="radio" name="options<%=i+1 %>">&nbsp;
+                            <%=j+1  %>&nbsp;&nbsp;
+                            <% } %>
+                            <%}%>
+                            <%# 文本填空 %>
+                            <% if(subQData[i].q_type == 4) { %>
+                            <h4>
+                                <%=i+1 %>.
+                                <%=subQData[i].q_desc %>
+                            </h4>
+                            <textarea class="form-control" rows="2" required></textarea>
+                            <%}%>
+                            <%# 数字填空 %>
+                            <% if(subQData[i].q_type == 5) { %>
+                            <h4>
+                                <%=i+1 %>.
+                                <%=subQData[i].q_desc %>
+                            </h4>
+                            <input class="form-control" type="number">
+                            <%}%>
+                            <hr>
+                        </div>
+                        <% } %>
+                    </form>
                     <% } %>
                 </div>
                 <br>
@@ -121,9 +139,6 @@
                     <button type="button" class="btn btn-default" id="addQuestionBtn">
                         <span class="glyphicon glyphicon-plus" aria-hidden="true">&nbsp;添加题目</span>
                     </button>
-                    <button type="button" class="btn btn-default" id="savaBtn">
-                        <span class="glyphicon glyphicon-ok" aria-hidden="true">&nbsp;保存问卷</span>
-                    </button>
                     <button type="button" class="btn btn-default" id="publishBtn">
                         <span class="glyphicon glyphicon-play-circle" aria-hidden="true">&nbsp;发布问卷</span>
                     </button>
@@ -139,7 +154,7 @@ $("#addQuestionBtn").click(function() {
 });
 
 // 发布问卷
-$("#publishBtn").click(function(){
+$("#publishBtn").click(function() {
     window.location.href = "/publishQuestionnaire";
 });
 
@@ -163,7 +178,7 @@ $("#qType13btn").click(function() {
 });
 
 // 关闭添加问题的DIV
-function closeMyModal(){
+function closeMyModal() {
     $("#addQuestion").css("display", "none");
 };
 
@@ -178,9 +193,18 @@ function verifyQuestionDesc() {
         alert("问题描述不能为空！");
         return;
     }
-    if ($("#questionType").val() == "2" && $("#radioLevel").val() == "") {
-        alert("请输入分级！");
-        return;
+    // 打分形式，先验证是否填写分级，然后验证分级范围是否合法
+    if ($("#questionType").val() == "2") {
+        if ($("#radioLevel").val() == "") {
+            alert("请输入分级！");
+            return;
+        } else {
+            var radioLevel = parseInt($("#radioLevel").val());
+            if (radioLevel > 5 || radioLevel < 2) {
+                alert("分级需要在 2 到 5 之间");
+                return;
+            }
+        }
     }
 
     $("#addQuestionForm").submit();

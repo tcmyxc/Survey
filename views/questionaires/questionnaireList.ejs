@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <% include ../components/headElements.html %>
+</head>
+
+<body>
+    <% include ../components/header.html %>
+    <div class="container-fluid">
+        <div class="row">
+            <% include ../components/sidebar.html %>
+            <!-- 网站主要内容存放的地方 -->
+            <div class="col-sm-10 col-sm-offset-2 col-md-10 col-md-offset-2 main">
+                <h1 class="page-header">问卷网站</h1>
+                <table class="table table-striped">
+                    <caption>问卷列表</caption>
+                    <thead>
+                        <tr>
+                            <th>问卷名</th>
+                            <th>问卷状态</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% if(length == 0){ %>
+                        <tr>您暂时好像没有创建问卷呢^-^</tr>
+                        <% } %>
+                        <% if(length > 0){ %>
+                            <% for(var i=0; i<length; i++){ %>
+                                <tr>
+                                    <td><%=data[i].title  %></td>
+                                    <%# 问卷状态 %>
+                                    <% if(data[i].status == 0){ %>
+                                        <td>未发布</td>
+                                    <% } %>
+                                    <% if(data[i].status == 1){ %>
+                                        <td>已发布</td>
+                                    <% } %>
+                                    <% if(data[i].status == 2){ %>
+                                        <td>已停止</td>
+                                    <% } %>
+                                    <%# 问卷的操作 %>
+                                    <td>
+                                        <a href="/viewQuestionnaire?qID=<%=data[i].id%>" class="btn btn-default" role="button">问卷预览</a>
+                                        <a href="#" class="btn btn-default" role="button">编辑</a>
+                                        <a href="#" class="btn btn-default" role="button">删除</a> 
+                                        <% if(data[i].status == 1 || data[i].status == 2){ %>
+                                            <a href="#" class="btn btn-default" role="button">查看问卷收集结果</a>
+                                        <% } %> 
+                                        <% if(data[i].status == 1){ %>
+                                            <a href="#" class="btn btn-default" role="button">停止收集</a>
+                                        <% } %>
+                                        <% if(data[i].status == 0){ %>
+                                            <a href="/publishQuestionnaire?qID=<%=data[i].id%>" class="btn btn-default" role="button">发布问卷</a>
+                                        <% } %>                                 
+                                    </td>
+                                </tr>
+                            <% } %>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#createQuestionnaire").removeClass("active");
+    $("#myQuestionnaire").addClass("active");
+});
+</script>
+
+</html>
