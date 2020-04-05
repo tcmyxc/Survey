@@ -28,7 +28,7 @@
             <div class="main">
                 <h1 class="page-header text-center">欢迎来到问卷网站</h1>
                 <div class="col-sm-4 col-sm-offset-4 col-md-4 col-md-offset-4">
-                    <form class="form-group" method="post" action="/addUser">
+                    <form id="addUserForm" class="form-group" method="post" action="/addUser">
                         <h3 style="color: blue;">注册</h3>
                         <div class="form-group">
                             <label for="username">用户名：</label>
@@ -51,5 +51,35 @@
         </div>
     </div>
 </body>
+
+<script type="text/javascript">
+    $('#addUserForm').on('submit', function(event){
+        event.preventDefault();//阻止默认提交动作
+        var formData = $(this).serialize();
+        console.log(formData);
+        $.ajax({
+            url: '/addUser',
+            type: 'post',
+            data: formData,
+            dataType: 'json',
+            success: function(data){
+                console.log(data);
+                if (data.status === 1) {
+                    alert('用户名已被占用!')
+                } else if (data.status === 2) {
+                    alert('邮箱已被占用!')
+                } else if (data.status === 3) {
+                    alert('注册成功，点击进入网站！');
+                    window.location.href='/home';
+                } else {
+                    alert('未知错误!');
+                }
+            },
+            error: function(){
+                alert('未知错误!');
+            }
+        });
+    });
+</script>
 
 </html>

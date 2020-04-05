@@ -78,18 +78,16 @@ router.get('/signin', function(req, res, next) {
 
 // 添加用户，进一步分离了模块，暂时改造了一个
 // 后面的函数看情况修改（已经写好的有时间再改，后面写的尽量分离）
+// 2020-04-06 改为AJAX异步提交表单（有精力就改改，没时间就算了）
 router.post('/addUser', function(req, res, next) {
-    console.log(req.body);
+    //console.log(req.body);
     aModle.addUser(req, function(err, status) {
         if (err) {
             console.log(err);
         } else {
-            console.log(status);
-            if (status === 1) {
-                return res.send("<script>alert('用户名已被占用!');window.location.href='/signin';</script>");
-            } else if (status === 2) {
-                return res.send("<script>alert('邮箱已被占用!');window.location.href='/signin';</script>");
-            } else if (status === 3) {
+            //console.log(status);
+
+            if (status === 3) {
                 var token = {
                     username: null,
                     email: null
@@ -97,11 +95,29 @@ router.post('/addUser', function(req, res, next) {
                 token.username = req.body.username;
                 token.email = req.body.email;
                 req.session.token = token;
-
-                res.send("<script>alert('注册成功，点击进入网站！'); window.location.href='/home';</script>");
-            } else {
-                return res.send("<script>alert('未知错误!');window.location.href='/signin';</script>");
             }
+            //console.log(req.session.token);
+            return res.status(200).send({
+                status: status
+            });
+
+            // if (status === 1) {
+            //     return res.send("<script>alert('用户名已被占用!');window.location.href='/signin';</script>");
+            // } else if (status === 2) {
+            //     return res.send("<script>alert('邮箱已被占用!');window.location.href='/signin';</script>");
+            // } else if (status === 3) {
+            //     var token = {
+            //         username: null,
+            //         email: null
+            //     };
+            //     token.username = req.body.username;
+            //     token.email = req.body.email;
+            //     req.session.token = token;
+
+            //     res.send("<script>alert('注册成功，点击进入网站！'); window.location.href='/home';</script>");
+            // } else {
+            //     return res.send("<script>alert('未知错误!');window.location.href='/signin';</script>");
+            // }
         }
     });
 });
@@ -275,7 +291,7 @@ router.post('/userInfo', function(req, res, next) {
 
 //登出
 router.get('/logout', function(req, res, next) {
-    req.session.token.destroy();
+    req.session.destroy();//销毁session
     res.send("<script>alert('登出成功！即将跳转到网站主页'); window.location.href='/';</script>");
 });
 
