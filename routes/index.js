@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var db = require("../modules/sqlcon");
+var aModle = require("../modules/account");
 var uuidV1 = require('uuid/v1');
 
 /////////////////////////////////////////////
@@ -30,50 +31,81 @@ router.get('/signin', function(req, res, next) {
 
 // 注册表单信息提交
 // 2020.04.03
+// router.post('/addUser', function(req, res, next) {
+//     console.log(req.body);
+//     var username = req.body.username;
+//     var pwd = req.body.password;
+//     var email = req.body.email;
+//     var sql = 'select * from user where username=?';
+//     db.query(sql, username, function(err, data) {
+//         if (err) {
+//             console.log(err);
+//         } else {
+//             if (data.length > 0) {
+//                 return res.send("<script>alert('用户名已被占用!');window.location.href='/signin';</script>");
+//             } else {
+//                 var sql = 'select * from user where email=?';
+//                 db.query(sql, email, function(err, data) {
+//                     if (err) {
+//                         console.log(err);
+//                     } else {
+//                         if (data.length > 0) {
+//                             return res.send("<script>alert('邮箱已被占用!');window.location.href='/signin';</script>");
+//                         } else {
+//                             var sql = 'insert into user(username, password, email) values (?, ?, ?)';
+//                             db.query(sql, [username, pwd, email], function(err, data) {
+//                                 if (err) {
+//                                     console.log('添加失败\n', err);
+//                                 } else {
+//                                     var token = {
+//                                         username: null,
+//                                         email: null
+//                                     };
+//                                     token.username = username;
+//                                     token.email = email;
+//                                     req.session.token = token;
+
+//                                     res.send("<script>alert('注册成功，点击进入网站！'); window.location.href='/home';</script>");
+//                                 }
+//                             });
+//                         }
+//                     }
+//                 });
+//             }
+//         }
+//     });
+// });
+
+// 添加用户，进一步分离了模块，暂时改造了一个
+// 后面的函数看情况修改（已经写好的有时间再改，后面写的尽量分离）
 router.post('/addUser', function(req, res, next) {
     console.log(req.body);
-    var username = req.body.username;
-    var pwd = req.body.password;
-    var email = req.body.email;
-    var sql = 'select * from user where username=?';
-    db.query(sql, username, function(err, data) {
+    aModle.addUser(req, function(err, status) {
         if (err) {
             console.log(err);
         } else {
-            if (data.length > 0) {
+            console.log(status);
+            if (status === 1) {
                 return res.send("<script>alert('用户名已被占用!');window.location.href='/signin';</script>");
-            } else {
-                var sql = 'select * from user where email=?';
-                db.query(sql, email, function(err, data) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        if (data.length > 0) {
-                            return res.send("<script>alert('邮箱已被占用!');window.location.href='/signin';</script>");
-                        } else {
-                            var sql = 'insert into user(username, password, email) values (?, ?, ?)';
-                            db.query(sql, [username, pwd, email], function(err, data) {
-                                if (err) {
-                                    console.log('添加失败\n', err);
-                                } else {
-                                    var token = {
-                                        username: null,
-                                        email: null
-                                    };
-                                    token.username = username;
-                                    token.email = email;
-                                    req.session.token = token;
+            } else if (status === 2) {
+                return res.send("<script>alert('邮箱已被占用!');window.location.href='/signin';</script>");
+            } else if (status === 3) {
+                var token = {
+                    username: null,
+                    email: null
+                };
+                token.username = req.body.username;
+                token.email = req.body.email;
+                req.session.token = token;
 
-                                    res.send("<script>alert('注册成功，点击进入网站！'); window.location.href='/home';</script>");
-                                }
-                            });
-                        }
-                    }
-                });
+                res.send("<script>alert('注册成功，点击进入网站！'); window.location.href='/home';</script>");
+            } else {
+                return res.send("<script>alert('未知错误!');window.location.href='/signin';</script>");
             }
         }
     });
 });
+
 
 // 登录表单提交
 router.post('/login', function(req, res, next) {
@@ -297,17 +329,10 @@ router.post('/createQuestionnaire', function(req, res, next) {
             if (err) {
                 console.log(err);
             } else {
-                var sql = "SELECT LAST_INSERT_ID() as qID";
-                db.query(sql, function(err, data) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        console.log('问卷ID:', data[0].qID);
-                        req.session.token.qID = data[0].qID;
-                        //console.log(req.session.token.qID);
-                        res.redirect("/createQuestionnaire");
-                    }
-                });
+                //console.log('问卷ID:', data.insertId);// 直接获取问卷ID，调用data.insertId即可，不需要再次查询
+                req.session.token.qID = data.insertId;
+                //console.log(req.session.token.qID);
+                res.redirect("/createQuestionnaire");
             }
         });
     }
@@ -378,15 +403,15 @@ router.get('/publishQuestionnaire', function(req, res, next) {
             console.log(err);
         }
     });
-   
+
     req.session.token.qID = null; // 问卷发布之后将token里面的qID清掉
 
     var username = req.session.token.username;
-    var URL = '127.0.0.1:3000/questionnaires?qID=' + qID; 
+    var URL = '127.0.0.1:3000/questionnaires?qID=' + qID;
     res.render('../views/questionaires/questionnaireURL', {
         title: "问卷链接",
         username: username,
-        url : URL
+        url: URL
     });
 });
 
@@ -437,7 +462,7 @@ router.get('/viewQuestionnaire', function(req, res, next) {
                 username: username,
                 subQData: data,
                 length: length,
-                url : URL
+                url: URL
             });
         }
     });
@@ -453,16 +478,16 @@ router.get('/questionnaires', function(req, res, next) {
         } else {
             //console.log("问题个数：" + data.length);
             var length = data.length;
-            if(length == 0){
+            if (length == 0) {
                 return res.send("<script>alert('请检查网址是否输入正确');</script>");
             }
 
             // 如果查询结果为空，那就不存在状态，所以这个判断要写在下面
             var status = data[0].status;
-            if(status == 0){
+            if (status == 0) {
                 return res.send("<script>alert('请检查网址是否输入正确');</script>");
             }
-            if(status == 2){
+            if (status == 2) {
                 return res.send("<script>alert('问卷已停止收集');</script>")
             }
             res.render('../views/questionaires/fillQuestionnaire', {
@@ -471,7 +496,7 @@ router.get('/questionnaires', function(req, res, next) {
                 questionnaireDesc: data[0].desc,
                 subQData: data,
                 length: length,
-                url : URL
+                url: URL
             });
         }
     });
