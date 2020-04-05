@@ -3,6 +3,8 @@
 
 <head>
     <% include ../components/headElements.html %>
+    <script type="text/javascript" src="lib/jquery-validation/jquery.validate.min.js"></script>
+    <script type="text/javascript" src="lib/jquery-validation/messages_zh.min.js"></script>
 </head>
 
 <body>
@@ -20,49 +22,54 @@
                     </p>
                     <hr>
                     <% if(length>0) { %>
-                    <form method="post">
+                    <form method="post" id="fillMyForm">
                         <% for(var i=0; i<length; i++){%>
                         <div id="subq<%=i+1%>" class="form-group">
                             <%# 单选 %>
                             <% if(subQData[i].q_type == 1) { %>
-                            <h4>
-                                <%=i+1 %>.
-                                <%=subQData[i].q_desc %>
-                            </h4>
-                            <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
-                            <% var options=JSON.parse(subQData[i].q_options) %>
-                            <% for(var j=0; j<options.length; j++){ %>
-                            <%# 单选name要相同 %>
-                            <input type="radio" name="<%=subQData[i].q_desc %>" value="<%=options[j]  %>">&nbsp;
-                            <%=options[j]  %>&nbsp;&nbsp;
-                            <% } %>
+                                <h4>
+                                    <%=i+1 %>.
+                                    <%=subQData[i].q_desc %>
+                                </h4>
+                                <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
+                                <% var options=JSON.parse(subQData[i].q_options) %>
+
+                                <% for(var j=0; j<options.length; j++){ %>
+                                <%# 单选name要相同 %>
+                                    <input type="radio" name="<%=subQData[i].q_desc %>" value="<%=options[j]  %>" required>&nbsp;
+                                    <%=options[j]  %>&nbsp;&nbsp;
+                                <% } %>
+                                <label for="<%=subQData[i].q_desc %>" class="error"></label>
                             <%}%>
                             <%# 多选 %>
                             <% if(subQData[i].q_type == 3) { %>
-                            <h4>
-                                <%=i+1 %>.
-                                <%=subQData[i].q_desc %>
-                            </h4>
-                            <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
-                            <% var options=JSON.parse(subQData[i].q_options) %>
-                            <% for(var j=0; j<options.length; j++){ %>
-                            <input type="checkbox" name="<%=subQData[i].q_desc %>" value="<%=options[j]  %>">&nbsp;
-                            <%=options[j]  %>&nbsp;&nbsp;
-                            <% } %>
+                                <h4>
+                                    <%=i+1 %>.
+                                    <%=subQData[i].q_desc %>
+                                </h4>
+                                <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
+                                <% var options=JSON.parse(subQData[i].q_options) %>
+                                <% for(var j=0; j<options.length; j++){ %>
+                                    <input type="checkbox" name="<%=subQData[i].q_desc %>" value="<%=options[j]  %>" required>&nbsp;
+                                    <%=options[j]  %>&nbsp;&nbsp;
+                                <% } %>
+                                <%# 给一个占位的标签即可，如果没有选择，标签里面的内容会被替换为提示信息并显示 %>
+                                <label for="<%=subQData[i].q_desc %>" class="error"></label>
                             <%}%>
                             <%# 打分单选 %>
                             <% if(subQData[i].q_type == 2) { %>
-                            <h4>
-                                <%=i+1 %>.
-                                <%=subQData[i].q_desc %>
-                            </h4>
-                            <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
-                            <% var levels=subQData[i].q_level %>
-                            <% for(var j=0; j<levels; j++){ %>
-                            <%# 单选name要相同 %>
-                            <input type="radio" name="<%=subQData[i].q_desc %>" value="<%=j+1  %>">&nbsp;
-                            <%=j+1  %>&nbsp;&nbsp;
-                            <% } %>
+                                <h4>
+                                    <%=i+1 %>.
+                                    <%=subQData[i].q_desc %>
+                                </h4>
+                                <%# 如果只能选择一个，name属性要相同,先将JSON字符串转为JSON对象，然后打印出来 %>
+                                <% var levels=subQData[i].q_level %>
+                                <% for(var j=0; j<levels; j++){ %>
+                                    <%# 单选name要相同 %>
+                                    <input type="radio" name="<%=subQData[i].q_desc %>" value="<%=j+1  %>" required>&nbsp;
+                                    <%=j+1  %>&nbsp;&nbsp;
+                                <% } %>
+                                <label for="<%=subQData[i].q_desc %>" class="error"></label>
                             <%}%>
                             <%# 文本填空 %>
                             <% if(subQData[i].q_type == 4) { %>
@@ -78,7 +85,7 @@
                                 <%=i+1 %>.
                                 <%=subQData[i].q_desc %>
                             </h4>
-                            <input class="form-control" type="number" name="<%=subQData[i].q_desc %>">
+                            <input class="form-control" type="number" name="<%=subQData[i].q_desc %>" required>
                             <%}%>
                             <hr>
                         </div>
@@ -95,5 +102,11 @@
         </div>
     </div>
 </body>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $("#fillMyForm").validate();
+    });
+</script>
 
 </html>
