@@ -4,6 +4,7 @@ var db = require("../modules/sqlcon");
 var aModle = require("../modules/account");
 var uuidV1 = require('uuid/v1');
 
+
 /////////////////////////////////////////////
 // 2020-04-03
 //   + 已完成
@@ -80,10 +81,11 @@ router.get('/signin', function(req, res, next) {
 // 后面的函数看情况修改（已经写好的有时间再改，后面写的尽量分离）
 // 2020-04-06 改为AJAX异步提交表单（有精力就改改，没时间就算了）
 router.post('/addUser', function(req, res, next) {
-    //console.log(req.body);
+    console.log(req.body);
     aModle.addUser(req, function(err, status) {
         if (err) {
             console.log(err);
+            return res.send('<script>alert("服务器故障，请稍后重试")</script>');
         } else {
             //console.log(status);
 
@@ -132,6 +134,7 @@ router.post('/login', function(req, res, next) {
     db.query(sql, [username, passwprd], function(err, data) {
         if (err) {
             console.log(err);
+            return res.send('<script>alert("服务器故障，请稍后重试")</script>');
         } else if (data.length > 0) {
             var token = {
                 username: null,
@@ -165,6 +168,7 @@ router.post('/findPWD', function(req, res, next) {
     db.query(sql, [pwd, username], function(err, data) {
         if (err) {
             console.log(err);
+            return res.send('<script>alert("服务器故障，请稍后重试")</script>');
         } else {
             res.send("<script>alert('修改成功，进入登录页面!');window.location.href='/';</script>");
         }
@@ -257,6 +261,7 @@ router.post('/userInfo', function(req, res, next) {
     db.query(sql, username, function(err, data) {
         if (err) {
             console.log(err);
+            return res.send('<script>alert("服务器故障，请稍后重试")</script>');
         } else {
             // 邮箱相同
             //console.log(data);// 返回的是一个数组
@@ -267,6 +272,7 @@ router.post('/userInfo', function(req, res, next) {
                 db.query(sql, email, function(err, data) {
                     if (err) {
                         console.log(err);
+                        return res.send('<script>alert("服务器故障，请稍后重试")</script>');
                     } else {
                         // 邮箱被占用
                         if (data.length > 0) {
@@ -276,6 +282,7 @@ router.post('/userInfo', function(req, res, next) {
                             db.query(sql, [email, pwd, username], function(err, data) {
                                 if (err) {
                                     console.log(err);
+                                    return res.send('<script>alert("服务器故障，请稍后重试")</script>');
                                 } else {
                                     req.session.token.email = email;
                                     res.redirect('/userInfo');
@@ -291,7 +298,7 @@ router.post('/userInfo', function(req, res, next) {
 
 //登出
 router.get('/logout', function(req, res, next) {
-    req.session.destroy();//销毁session
+    req.session.destroy(); //销毁session
     res.send("<script>alert('登出成功！即将跳转到网站主页'); window.location.href='/';</script>");
 });
 
@@ -308,6 +315,7 @@ router.get('/createQuestionnaire', function(req, res, next) {
     db.query(sql, qID, function(err, data) {
         if (err) {
             console.log(err);
+            return res.send('<script>alert("服务器故障，请稍后重试")</script>');
         } else {
             //console.log("问题个数：" + data.length);
             var length = data.length;
@@ -344,6 +352,7 @@ router.post('/createQuestionnaire', function(req, res, next) {
         db.query(sql, [title, desc, owner], function(err, data) {
             if (err) {
                 console.log(err);
+                return res.send('<script>alert("服务器故障，请稍后重试")</script>');
             } else {
                 //console.log('问卷ID:', data.insertId);// 直接获取问卷ID，调用data.insertId即可，不需要再次查询
                 req.session.token.qID = data.insertId;
@@ -375,6 +384,7 @@ router.post('/addQuestion', function(req, res, next) {
         db.query(sql, [qID, qType, qMust, qDesc, qOptions], function(err, data) {
             if (err) {
                 console.log(err);
+                return res.send('<script>alert("服务器故障，请稍后重试")</script>');
             } else {
                 res.redirect("/createQuestionnaire");
             }
@@ -385,6 +395,7 @@ router.post('/addQuestion', function(req, res, next) {
         db.query(sql, [qID, qType, qMust, qDesc, qLevel], function(err, data) {
             if (err) {
                 console.log(err);
+                return res.send('<script>alert("服务器故障，请稍后重试")</script>');
             } else {
                 res.redirect("/createQuestionnaire");
             }
@@ -395,6 +406,7 @@ router.post('/addQuestion', function(req, res, next) {
         db.query(sql, [qID, qType, qMust, qDesc], function(err, data) {
             if (err) {
                 console.log(err);
+                return res.send('<script>alert("服务器故障，请稍后重试")</script>');
             } else {
                 res.redirect("/createQuestionnaire");
             }
@@ -417,6 +429,7 @@ router.get('/publishQuestionnaire', function(req, res, next) {
     db.query(sql, qID, function(err, data) {
         if (err) {
             console.log(err);
+            return res.send('<script>alert("服务器故障，请稍后重试")</script>');
         }
     });
 
@@ -442,6 +455,7 @@ router.get('/myQuestionnaire', function(req, res, next) {
     db.query(sql, username, function(err, data) {
         if (err) {
             console.log(err);
+            return res.send('<script>alert("服务器故障，请稍后重试")</script>');
         } else {
             //console.log("问题个数：" + data.length);
             var length = data.length;
@@ -468,6 +482,7 @@ router.get('/viewQuestionnaire', function(req, res, next) {
     db.query(sql, qID, function(err, data) {
         if (err) {
             console.log(err);
+            return res.send('<script>alert("服务器故障，请稍后重试")</script>');
         } else {
             //console.log("问题个数：" + data.length);
             var length = data.length;
@@ -491,9 +506,11 @@ router.get('/questionnaires', function(req, res, next) {
     db.query(sql, qID, function(err, data) {
         if (err) {
             console.log(err);
+            return res.send('<script>alert("服务器故障，请稍后重试")</script>');
         } else {
             //console.log("问题个数：" + data.length);
             var length = data.length;
+            // 不存在这个问卷
             if (length == 0) {
                 return res.send("<script>alert('请检查网址是否输入正确');</script>");
             }
@@ -512,6 +529,7 @@ router.get('/questionnaires', function(req, res, next) {
                 questionnaireDesc: data[0].desc,
                 subQData: data,
                 length: length,
+                qID: qID,
                 url: URL
             });
         }
@@ -520,8 +538,67 @@ router.get('/questionnaires', function(req, res, next) {
 
 // 问卷填写的数据，post提交
 router.post('/questionnaires', function(req, res, next) {
+    // console.log(req.body);
+    // console.log(typeof req.body);// object
+    var qID = req.body.qID;
+    delete req.body.qID;
     console.log(req.body);
-    res.send("<script>alert('感谢您的填写');</script>")
+    var q_data = JSON.stringify(req.body);
+    console.log(q_data);
+    var sql = 'insert into q_data (q_id, data) values (?, ?)';
+    db.query(sql, [qID, q_data], function(err, data) {
+        if (err) {
+            console.log(err);
+            return res.send('<script>alert("服务器故障，请稍后重试")</script>');
+        } else {
+            return res.send("<script>alert('感谢您的填写');</script>")
+        }
+    });
+});
+
+// 查看问卷填写结果
+router.get('/questionnaireResult', function(req, res, next) {
+    var qID = req.query.qID;
+    var questionnaireTitle = null;
+    var questionnaireDesc = null;
+    var sql = 'select * from questionnaire where id=?';
+    db.query(sql, qID, function(err, data) {
+        if (err) {
+            console.log(err);
+            return res.send('<script>alert("服务器故障，请稍后重试")</script>');
+        } else {
+            console.log(data);
+            questionnaireTitle = data[0].title;
+            questionnaireDesc = data[0].desc;
+            var sql = 'select data from q_data where q_id =?';
+            db.query(sql, qID, function(err, data) {
+                if (err) {
+                    console.log(err);
+                    return res.send('<script>alert("服务器故障")</script>');
+                } else {
+                    //console.log(typeof data);
+                    //console.log(JSON.parse(JSON.stringify(data)));
+
+                    // 先去除ROWDATA，然后只取出来Data的值，也就是填写的内容
+                    data = JSON.parse(JSON.stringify(data));
+                    for (var i = 0; i < data.length; i++) {
+                        data[i] = JSON.parse(JSON.stringify(data[i].data));
+                        console.log(data[i]);
+                    }
+                    //console.log(typeof data);
+
+                    res.render('../views/questionaires/questionnaireResult', {
+                        title: "问卷结果",
+                        qID: qID,
+                        username: req.session.token.username,
+                        questionnaireTitle: questionnaireTitle,
+                        questionnaireDesc: questionnaireDesc,
+                        data: data
+                    });
+                }
+            });
+        }
+    });
 });
 
 module.exports = router;

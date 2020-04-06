@@ -46,7 +46,7 @@
                                         <a href="#" class="btn btn-default" role="button">编辑</a>
                                         <a href="#" class="btn btn-default" role="button">删除</a> 
                                         <% if(data[i].status == 1 || data[i].status == 2){ %>
-                                            <a href="#" class="btn btn-default" role="button">查看问卷收集结果</a>
+                                            <a href="/questionnaireResult?qID=<%=data[i].id%>" class="btn btn-default" role="button">查看问卷收集结果</a>
                                         <% } %> 
                                         <% if(data[i].status == 1){ %>
                                             <a href="#" class="btn btn-default" role="button">停止收集</a>

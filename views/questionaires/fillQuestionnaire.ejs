@@ -23,6 +23,7 @@
                     <hr>
                     <% if(length>0) { %>
                     <form method="post" id="fillMyForm">
+                        <input type="text" name="qID" value="<%=qID%>" hidden>
                         <% for(var i=0; i<length; i++){%>
                         <div id="subq<%=i+1%>" class="form-group">
                             <%# 单选 %>
