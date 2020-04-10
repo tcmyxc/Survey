@@ -1,19 +1,22 @@
 var express = require('express');
 var router = express.Router();
-var db = require("../modules/sqlcon");
-var aModle = require("../modules/account");
+var db = require("../controllers/sqlcon");
+var accountModle = require("../controllers/account");
 var uuidV1 = require('uuid/v1');
 
 
 /////////////////////////////////////////////
-// 2020-04-03
+// 2020-04-10
 //   + 已完成
 //      - 注册、登录、修改密码、个人信息修改
 //      - 创建文卷、添加问题
-//   + 未完成
 //      - 文卷发布
-//      - 发布之后信息如何收集？
-//      - 统计信息如何展示？
+//      - 发布之后信息如何收集
+//      - 统计信息如何展示
+//  + 未完成
+//      - 级联选项
+//      - 发布问卷时的一些选项：如开始时间，截止时间，填写方式
+//      - 填写用户判断
 ////////////////////////////////////////////
 
 //主页
@@ -82,7 +85,7 @@ router.get('/signin', function(req, res, next) {
 // 2020-04-06 改为AJAX异步提交表单（有精力就改改，没时间就算了）
 router.post('/addUser', function(req, res, next) {
     console.log(req.body);
-    aModle.addUser(req, function(err, status) {
+    accountModle.addUser(req, function(err, status) {
         if (err) {
             console.log(err);
             return res.send('<script>alert("服务器故障，请稍后重试")</script>');
@@ -176,11 +179,11 @@ router.post('/findPWD', function(req, res, next) {
 });
 
 /* GET home page. */
-router.get('/home', function(req, res, next) {
-    if (!req.session.token) {
-        res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
-        return;
-    }
+router.get('/home', accountModle.loginRequired, function(req, res, next) {
+    // if (!req.session.token) {
+    //     res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
+    //     return;
+    // }
     var username = req.session.token.username;
     res.render('../views/home', {
         title: "Home",
@@ -189,11 +192,11 @@ router.get('/home', function(req, res, next) {
 });
 
 //帮助页面
-router.get('/help', function(req, res, next) {
-    if (!req.session.token) {
-        res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
-        return;
-    }
+router.get('/help', accountModle.loginRequired, function(req, res, next) {
+    // if (!req.session.token) {
+    //     res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
+    //     return;
+    // }
     var username = req.session.token.username;
     res.render('../views/help', {
         title: "帮助",
@@ -202,11 +205,11 @@ router.get('/help', function(req, res, next) {
 });
 
 //联系我们
-router.get('/contact', function(req, res, next) {
-    if (!req.session.token) {
-        res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
-        return;
-    }
+router.get('/contact', accountModle.loginRequired, function(req, res, next) {
+    // if (!req.session.token) {
+    //     res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
+    //     return;
+    // }
     var username = req.session.token.username;
     res.render('../views/contact', {
         title: "联系我们",
@@ -215,11 +218,11 @@ router.get('/contact', function(req, res, next) {
 });
 
 // 查看个人信息
-router.get('/userInfo', function(req, res, next) {
-    if (!req.session.token) {
-        res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
-        return;
-    }
+router.get('/userInfo', accountModle.loginRequired, function(req, res, next) {
+    // if (!req.session.token) {
+    //     res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
+    //     return;
+    // }
 
     var username = req.session.token.username;
     var email = req.session.token.email;
@@ -246,11 +249,11 @@ router.get('/userInfo', function(req, res, next) {
 });
 
 //修改个人信息
-router.post('/userInfo', function(req, res, next) {
-    if (!req.session.token) {
-        res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
-        return;
-    }
+router.post('/userInfo', accountModle.loginRequired, function(req, res, next) {
+    // if (!req.session.token) {
+    //     res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
+    //     return;
+    // }
     //console.log(req.body);
     //console.log(req.session.token.username);
     var username = req.session.token.username;
@@ -303,11 +306,11 @@ router.get('/logout', function(req, res, next) {
 });
 
 //用户在创建表单页面刷新，则响应这个页面
-router.get('/createQuestionnaire', function(req, res, next) {
-    if (!req.session.token) {
-        res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
-        return;
-    }
+router.get('/createQuestionnaire', accountModle.loginRequired, function(req, res, next) {
+    // if (!req.session.token) {
+    //     res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
+    //     return;
+    // }
     var qID = req.session.token.qID;
     //console.log(qID);
     var username = req.session.token.username;
@@ -332,11 +335,11 @@ router.get('/createQuestionnaire', function(req, res, next) {
 });
 
 //创建问卷
-router.post('/createQuestionnaire', function(req, res, next) {
-    if (!req.session.token) {
-        res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
-        return;
-    }
+router.post('/createQuestionnaire', accountModle.loginRequired, function(req, res, next) {
+    // if (!req.session.token) {
+    //     res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
+    //     return;
+    // }
     //console.log(req.body);
     // 如果用户在创建文卷界面刷新
     if (req.session.token.qID) {
@@ -364,11 +367,11 @@ router.post('/createQuestionnaire', function(req, res, next) {
 });
 
 // 添加问题
-router.post('/addQuestion', function(req, res, next) {
-    if (!req.session.token) {
-        res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
-        return;
-    }
+router.post('/addQuestion', accountModle.loginRequired, function(req, res, next) {
+    // if (!req.session.token) {
+    //     res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
+    //     return;
+    // }
 
     //console.log(req.body);
 
@@ -418,11 +421,11 @@ router.post('/addQuestion', function(req, res, next) {
 });
 
 // 发布问卷，先生成唯一码，然后发布问卷
-router.get('/publishQuestionnaire', function(req, res, next) {
-    if (!req.session.token) {
-        res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
-        return;
-    }
+router.get('/publishQuestionnaire', accountModle.loginRequired, function(req, res, next) {
+    // if (!req.session.token) {
+    //     res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
+    //     return;
+    // }
     // 将问卷状态设置为已发布，然后生成一个唯一码（暂时未做）
     var qID = req.session.token.qID ? req.session.token.qID : req.query.qID;
     var sql = "update questionnaire set status='1' where id=?";
@@ -445,11 +448,11 @@ router.get('/publishQuestionnaire', function(req, res, next) {
 });
 
 // 我的问卷
-router.get('/myQuestionnaire', function(req, res, next) {
-    if (!req.session.token) {
-        res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
-        return;
-    }
+router.get('/myQuestionnaire', accountModle.loginRequired, function(req, res, next) {
+    // if (!req.session.token) {
+    //     res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
+    //     return;
+    // }
     var username = req.session.token.username;
     var sql = "select * from questionnaire where owner=?";
     db.query(sql, username, function(err, data) {
@@ -470,11 +473,11 @@ router.get('/myQuestionnaire', function(req, res, next) {
 });
 
 // 预览文卷
-router.get('/viewQuestionnaire', function(req, res, next) {
-    if (!req.session.token) {
-        res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
-        return;
-    }
+router.get('/viewQuestionnaire', accountModle.loginRequired, function(req, res, next) {
+    // if (!req.session.token) {
+    //     res.send("<script>alert('登录已过期，请重新登录!');window.location.href='/';</script>").end();
+    //     return;
+    // }
     var qID = req.query.qID;
     var URL = '127.0.0.1:3000/questionnaires?qID=' + qID;
     var username = req.session.token.username;
@@ -557,7 +560,7 @@ router.post('/questionnaires', function(req, res, next) {
 });
 
 // 查看问卷填写结果
-router.get('/questionnaireResult', function(req, res, next) {
+router.get('/questionnaireResult', accountModle.loginRequired, function(req, res, next) {
     var qID = req.query.qID;
     var questionnaireTitle = null;
     var questionnaireDesc = null;

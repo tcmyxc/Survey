@@ -28,8 +28,12 @@ app.use(session({
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(bodyParser.json());
+
+// This object will contain key-value pairs, 
+// where the value can be a string or array (when extended is false), 
+// or any type (when extended is true).
 app.use(bodyParser.urlencoded({
-    extended: true
+    extended: false
 }));
 
 app.use('/', indexRouter);
