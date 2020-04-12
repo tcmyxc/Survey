@@ -6,6 +6,7 @@ let session = require('express-session');
 var logger = require('morgan');
 var bodyParser = require('body-parser'); 
 
+// 引入路由
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 
@@ -20,22 +21,27 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({
-    secret: 'recommand 128 bytes random string', // 建议使用 128 个字符的随机字符串
+    secret: 'hello tcmyxc',
     cookie: { maxAge: 30000 * 60 * 1000 }, //cookie生存周期30*60秒
     resave: true,  //cookie之间的请求规则,假设每次登陆，就算会话存在也重新保存一次
     saveUninitialized: true //强制保存未初始化的会话到存储器
-}));  //这些是写在app.js里面的
+}));
+
+// 静态资源文件夹
 app.use(express.static(path.join(__dirname, 'public')));
 
+// 配置中间件
 app.use(bodyParser.json());
 
 // This object will contain key-value pairs, 
 // where the value can be a string or array (when extended is false), 
 // or any type (when extended is true).
+// 由于提交的类型不止是字符串，所以设置为true
 app.use(bodyParser.urlencoded({
-    extended: false
+    extended: true
 }));
 
+// 配置路由（中间件配置需要在路由前面写好）
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 

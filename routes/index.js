@@ -3,6 +3,7 @@ var router = express.Router();
 var db = require("../controllers/sqlcon");
 var accountModle = require("../controllers/account");
 var uuidV1 = require('uuid/v1');
+var md5 = require('md5');
 
 
 /////////////////////////////////////////////
@@ -84,7 +85,7 @@ router.get('/signin', function(req, res, next) {
 // 后面的函数看情况修改（已经写好的有时间再改，后面写的尽量分离）
 // 2020-04-06 改为AJAX异步提交表单（有精力就改改，没时间就算了）
 router.post('/addUser', function(req, res, next) {
-    console.log(req.body);
+    // console.log(req.body);
     accountModle.addUser(req, function(err, status) {
         if (err) {
             console.log(err);
@@ -132,9 +133,10 @@ router.post('/addUser', function(req, res, next) {
 router.post('/login', function(req, res, next) {
     //console.log(req.body);
     var username = req.body.username;
-    var passwprd = req.body.password;
+    var password = md5(md5(req.body.password) + 'tcmyxc');
+    //console.log(password);
     var sql = "select * from user where username=? and password=?";
-    db.query(sql, [username, passwprd], function(err, data) {
+    db.query(sql, [username, password], function(err, data) {
         if (err) {
             console.log(err);
             return res.send('<script>alert("服务器故障，请稍后重试")</script>');
@@ -166,7 +168,7 @@ router.get('/findPWD', function(req, res, next) {
 // 修改密码，表单提交
 router.post('/findPWD', function(req, res, next) {
     var username = req.body.username;
-    var pwd = req.body.password;
+    var pwd = md5(md5(req.body.password) + 'tcmyxc');
     var sql = "update user set password=? where username=?";
     db.query(sql, [pwd, username], function(err, data) {
         if (err) {

@@ -1,4 +1,5 @@
 const db = require('./sqlcon');
+var md5 = require('md5');
 
 /**
  * 检查用户名或者邮箱是否存在
@@ -8,7 +9,7 @@ const db = require('./sqlcon');
 exports.addUser = function(req, callback) {
     try {
         var username = req.body.username;
-        var pwd = req.body.password;
+        var pwd = md5(md5(req.body.password) + 'tcmyxc');// 加密密码
         var email = req.body.email;
         var sql = 'select * from user where username=?';
         db.query(sql, username, function(err, data) {
