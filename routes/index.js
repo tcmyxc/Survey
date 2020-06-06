@@ -4,9 +4,9 @@ var uuidV1 = require('uuid/v1');
 var md5 = require('md5');
 
 // 自定义模块
-var db = require("../modules/sqlcon");
-var userModule = require("../modules/user");
-var questionModule = require("../modules/questionnaire");
+var db = require("../models/sqlcon");
+var userModule = require("../models/user");
+var questionModule = require("../models/questionnaire");
 
 
 /////////////////////////////////////////////
