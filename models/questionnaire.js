@@ -24,8 +24,9 @@ exports.createQuestionnaire = function(req, callback) {
 exports.updateQuestionnaireStatusById = function(req, callback) {
 	try {
 		var qID = req.session.token.qID ? req.session.token.qID : req.query.qID;
-		var sql = "update questionnaire set status='1' where id=?";
-		db.query(sql, qID, function(err, data) {
+		var status = req.query.status ? req.query.status : 1;
+		var sql = "update questionnaire set status=? where id=?";
+		db.query(sql, [status, qID], function(err, data) {
 		    if (err) {
                 throw err;
             } else {
@@ -65,6 +66,64 @@ exports.viewQuestionnaire = function(req, callback) {
 		        callback(undefined, data);
 		    }
 		});
+	} catch (err) {
+	    callback(err);
+	}
+};
+
+//保存用户填写的表单数据
+exports.addQData = function(req, callback) {
+	try {
+		var qID = req.body.qID;
+		var u_ip = req.ip;
+		delete req.body.qID;
+		var q_data = JSON.stringify(req.body);
+
+		var sql = 'insert into q_data (q_id, data, u_ip) values (?, ?, ?)';
+		db.query(sql, [qID, q_data, u_ip], function(err, data) {
+		    if (err) {
+		        throw err;
+		    } else {
+		        callback(undefined, data);
+		    }
+		});
+	} catch (err) {
+	    callback(err);
+	}
+};
+
+//检查用户是否填写过表单
+exports.checkUIp = function(req, callback) {
+	try {
+		var u_ip = req.ip;
+		var qID = req.query.qID;
+		var sql = 'select * from q_data where u_ip = ? and q_id = ?';
+		db.query(sql, [u_ip, qID], function(err, data) {
+		    if (err) {
+		        throw err;
+		    } else {
+		        callback(undefined, data);
+		    }
+		});
+
+	} catch (err) {
+	    callback(err);
+	}
+};
+
+//查看问卷结果
+exports.viewResult = function(req, callback) {
+	try {
+		var qID = req.query.qID;
+		var sql = 'select * from questionnaire as q1,q_data as q2 where q1.id=q2.q_id and q1.id=?';
+		db.query(sql, qID, function(err, data) {
+		    if (err) {
+		        throw err;
+		    } else {
+		        callback(undefined, data);
+		    }
+		});
+
 	} catch (err) {
 	    callback(err);
 	}

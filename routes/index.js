@@ -10,17 +10,18 @@ var questionModule = require("../models/questionnaire");
 
 
 /////////////////////////////////////////////
-// 2020-04-10
+// 2020-06-07
 //   + 已完成
 //      - 注册、登录、修改密码、个人信息修改
 //      - 创建文卷、添加问题
 //      - 文卷发布
 //      - 发布之后信息如何收集
 //      - 统计信息如何展示
+//      - 删除问卷
+//      - 问卷开始截止时间让用户选择，给用户自由度
+//      - 每个用户只允许填写一下（根据IP判断）
 //  + 未完成
 //      - 级联选项
-//      - 发布问卷时的一些选项：如开始时间，截止时间，填写方式
-//      - 填写用户判断
 ////////////////////////////////////////////
 
 //主页
@@ -223,20 +224,19 @@ router.post('/userInfo', userModule.loginRequired, function(req, res, next) {
             if (data.length > 0 && data[0].email == email) {
                 return res.send("<script>alert('修改后的邮箱和原邮箱相同!');window.location.href='/userInfo';</script>");
             } else {
-                userModule.selectEmailByEmail(req, function(err, data){
+                userModule.selectEmailByEmail(req, function(err, data) {
                     if (err) {
                         console.log(err);
                         return res.send('<script>alert("服务器故障，请稍后重试")</script>');
-                    } else{
+                    } else {
                         if (data.length > 0) {
                             return res.send("<script>alert('邮箱被占用!');window.location.href='/userInfo';</script>");
-                        } else{
-                            userModule.updateUserInfo(req, function(err, data){
-                                if(err){
+                        } else {
+                            userModule.updateUserInfo(req, function(err, data) {
+                                if (err) {
                                     console.log(err);
                                     return res.send('<script>alert("服务器故障，请稍后重试")</script>');
-                                }
-                                else{
+                                } else {
                                     req.session.token.email = email;
                                     res.redirect('/userInfo');
                                 }
@@ -257,14 +257,15 @@ router.get('/logout', function(req, res, next) {
 
 //用户在创建表单页面刷新，则响应这个页面
 router.get('/createQuestionnaire', userModule.loginRequired, function(req, res, next) {
-    // var qID = req.session.token.qID;
+    // 如果是在我的问卷页面选择编辑选项，则接受到一个get请求，里面有qID这个内容，需要把qID换成用户想看的那一个
+    req.session.token.qID = req.query.qID ? req.query.qID : req.session.token.qID;
     var username = req.session.token.username;
 
     questionModule.viewQuestionnaire(req, function(err, data) {
         if (err) {
             console.log(err);
             return res.send('<script>alert("服务器故障，请稍后重试")</script>');
-        } else{
+        } else {
             //console.log("问题个数：" + data.length);
             var length = data.length;
             res.render('../views/createQuestionnaire', {
@@ -308,7 +309,7 @@ router.post('/createQuestionnaire', userModule.loginRequired, function(req, res,
     }
     // 如果是首次创建表单
     else {
-        questionModule.createQuestionnaire(req, function(err, data){
+        questionModule.createQuestionnaire(req, function(err, data) {
             if (err) {
                 console.log(err);
                 return res.send('<script>alert("服务器故障，请稍后重试")</script>');
@@ -338,13 +339,9 @@ router.post('/createQuestionnaire', userModule.loginRequired, function(req, res,
     }
 });
 
-// 添加问题，暂时没有改到module里面
+// 添加问题
 router.post('/addQuestion', userModule.loginRequired, function(req, res, next) {
-
-
-    //console.log(req.body);
-
-    var qID = req.session.token.qID;
+    var qID = (req.query.qID) ? req.query.qID : req.session.token.qID;
     var qType = req.body.questionType;
     var qMust = (req.body.questionMust == 'on') ? '1' : '0';
     var qDesc = req.body.subQuestionDesc;
@@ -402,8 +399,8 @@ router.get('/publishQuestionnaire', userModule.loginRequired, function(req, res,
     //     }
     // });
     // 
-    
-    questionModule.updateQuestionnaireStatusById(req, function(err, data){
+
+    questionModule.updateQuestionnaireStatusById(req, function(err, data) {
         if (err) {
             console.log(err);
             return res.send('<script>alert("服务器故障，请稍后重试")</script>');
@@ -419,6 +416,20 @@ router.get('/publishQuestionnaire', userModule.loginRequired, function(req, res,
         username: username,
         url: URL
     });
+});
+
+// 停止收集问卷
+router.get('/stopQuestionnaire', userModule.loginRequired, function(req, res, next) {
+    var qID = req.query.qID;
+
+    questionModule.updateQuestionnaireStatusById(req, function(err, data) {
+        if (err) {
+            console.log(err);
+            return res.send('<script>alert("服务器故障，请稍后重试")</script>');
+        }
+    })
+
+    res.redirect('/myQuestionnaire');
 });
 
 // 我的问卷
@@ -508,7 +519,7 @@ router.get('/viewQuestionnaire', userModule.loginRequired, function(req, res, ne
     // });
 });
 
-//删除问卷，暂时没有改到module里面
+//删除问卷
 router.get('/delQuestionnaire', userModule.loginRequired, function(req, res, next) {
     var qID = req.query.qID;
     var username = req.session.token.username;
@@ -549,57 +560,61 @@ router.get('/delQuestionnaire', userModule.loginRequired, function(req, res, nex
             }
         }
     });
-
 });
 
 // 问卷填写
 router.get('/questionnaires', function(req, res, next) {
-    var qID = req.query.qID;
-    //var sql = "select * from (select * from questionnaire as a left join questions as b on a.id = b.questionnaire_id) as tmp where id = ?";
-    questionModule.viewQuestionnaire(req, function(err, data) {
+    questionModule.checkUIp(req, function(err, data){
         if (err) {
             console.log(err);
             return res.send('<script>alert("服务器故障，请稍后重试")</script>');
         } else {
-            //console.log("问题个数：" + data.length);
-            var length = data.length;
-            // 不存在这个问卷
-            if (length == 0) {
-                return res.send("<script>alert('请检查网址是否输入正确');</script>");
+            if(data.length > 0){
+                res.send("<script>alert('您已经填写过该表单!');</script>").end();
+                return;
             }
+            else{
+                var qID = req.query.qID;
+                //var sql = "select * from (select * from questionnaire as a left join questions as b on a.id = b.questionnaire_id) as tmp where id = ?";
+                questionModule.viewQuestionnaire(req, function(err, data) {
+                    if (err) {
+                        console.log(err);
+                        return res.send('<script>alert("服务器故障，请稍后重试")</script>');
+                    } else {
+                        //console.log("问题个数：" + data.length);
+                        var length = data.length;
+                        // 不存在这个问卷
+                        if (length == 0) {
+                            return res.send("<script>alert('请检查网址是否输入正确');</script>");
+                        }
 
-            // 如果查询结果为空，那就不存在状态，所以这个判断要写在下面
-            var status = data[0].status;
-            if (status == 0) {
-                return res.send("<script>alert('请检查网址是否输入正确');</script>");
+                        // 如果查询结果为空，那就不存在状态，所以这个判断要写在下面
+                        var status = data[0].status;
+                        if (status == 0) {
+                            return res.send("<script>alert('请检查网址是否输入正确');</script>");
+                        }
+                        if (status == 2) {
+                            return res.send("<script>alert('问卷已停止收集');</script>")
+                        }
+                        res.render('../views/questionaires/fillQuestionnaire', {
+                            title: "问卷填写",
+                            questionnaireTitle: data[0].title,
+                            questionnaireDesc: data[0].desc,
+                            subQData: data,
+                            length: length,
+                            qID: qID,
+                            url: URL
+                        });
+                    }
+                });
             }
-            if (status == 2) {
-                return res.send("<script>alert('问卷已停止收集');</script>")
-            }
-            res.render('../views/questionaires/fillQuestionnaire', {
-                title: "问卷填写",
-                questionnaireTitle: data[0].title,
-                questionnaireDesc: data[0].desc,
-                subQData: data,
-                length: length,
-                qID: qID,
-                url: URL
-            });
         }
-    });
+    }) 
 });
 
-// 问卷填写的数据，post提交，暂时没有改到module里面
+// 问卷填写的数据，post提交
 router.post('/questionnaires', function(req, res, next) {
-    // console.log(req.body);
-    // console.log(typeof req.body);// object
-    var qID = req.body.qID;
-    delete req.body.qID;
-    console.log(req.body);
-    var q_data = JSON.stringify(req.body);
-    console.log(q_data);
-    var sql = 'insert into q_data (q_id, data) values (?, ?)';
-    db.query(sql, [qID, q_data], function(err, data) {
+    questionModule.addQData(req, function(err, data) {
         if (err) {
             console.log(err);
             return res.send('<script>alert("服务器故障，请稍后重试")</script>');
@@ -607,51 +622,94 @@ router.post('/questionnaires', function(req, res, next) {
             return res.send("<script>alert('感谢您的填写');</script>")
         }
     });
+
+    // // console.log(req.body);
+    // // console.log(typeof req.body);// object
+    // var qID = req.body.qID;
+    // delete req.body.qID;
+    // //console.log(req.body);
+    // var q_data = JSON.stringify(req.body);
+    // //console.log(q_data);
+    // var sql = 'insert into q_data (q_id, data) values (?, ?)';
+    // db.query(sql, [qID, q_data], function(err, data) {
+    //     if (err) {
+    //         console.log(err);
+    //         return res.send('<script>alert("服务器故障，请稍后重试")</script>');
+    //     } else {
+    //         return res.send("<script>alert('感谢您的填写');</script>")
+    //     }
+    // });
 });
 
-// 查看问卷填写结果，暂时没有改到module里面
+// 查看问卷填写结果
 router.get('/questionnaireResult', userModule.loginRequired, function(req, res, next) {
     var qID = req.query.qID;
-    var questionnaireTitle = null;
-    var questionnaireDesc = null;
-    var sql = 'select * from questionnaire where id=?';
-    db.query(sql, qID, function(err, data) {
+
+    questionModule.viewResult(req, function(err, data){
         if (err) {
             console.log(err);
-            return res.send('<script>alert("服务器故障，请稍后重试")</script>');
+            return res.send('<script>alert("服务器故障")</script>');
         } else {
-            console.log(data);
-            questionnaireTitle = data[0].title;
-            questionnaireDesc = data[0].desc;
-            var sql = 'select data from q_data where q_id =?';
-            db.query(sql, qID, function(err, data) {
-                if (err) {
-                    console.log(err);
-                    return res.send('<script>alert("服务器故障")</script>');
-                } else {
-                    //console.log(typeof data);
-                    //console.log(JSON.parse(JSON.stringify(data)));
+            var questionnaireTitle = data[0].title;
+            var questionnaireDesc = data[0].desc;
+            // 先去除ROWDATA，然后只取出来Data的值，也就是填写的内容
+            data = JSON.parse(JSON.stringify(data));
+            for (var i = 0; i < data.length; i++) {
+                data[i] = JSON.parse(JSON.stringify(data[i].data));
+                //console.log(data[i]);
+            }
+            //console.log(typeof data);
 
-                    // 先去除ROWDATA，然后只取出来Data的值，也就是填写的内容
-                    data = JSON.parse(JSON.stringify(data));
-                    for (var i = 0; i < data.length; i++) {
-                        data[i] = JSON.parse(JSON.stringify(data[i].data));
-                        console.log(data[i]);
-                    }
-                    //console.log(typeof data);
-
-                    res.render('../views/questionaires/questionnaireResult', {
-                        title: "问卷结果",
-                        qID: qID,
-                        username: req.session.token.username,
-                        questionnaireTitle: questionnaireTitle,
-                        questionnaireDesc: questionnaireDesc,
-                        data: data
-                    });
-                }
+            res.render('../views/questionaires/questionnaireResult', {
+                title: "问卷结果",
+                qID: qID,
+                username: req.session.token.username,
+                questionnaireTitle: questionnaireTitle,
+                questionnaireDesc: questionnaireDesc,
+                data: data
             });
         }
-    });
+    })
+
+
+    // var sql = 'select * from questionnaire where id=?';
+    // db.query(sql, qID, function(err, data) {
+    //     if (err) {
+    //         console.log(err);
+    //         return res.send('<script>alert("服务器故障，请稍后重试")</script>');
+    //     } else {
+    //         console.log(data);
+    //         questionnaireTitle = data[0].title;
+    //         questionnaireDesc = data[0].desc;
+    //         var sql = 'select data from q_data where q_id =?';
+    //         db.query(sql, qID, function(err, data) {
+    //             if (err) {
+    //                 console.log(err);
+    //                 return res.send('<script>alert("服务器故障")</script>');
+    //             } else {
+    //                 //console.log(typeof data);
+    //                 //console.log(JSON.parse(JSON.stringify(data)));
+
+    //                 // 先去除ROWDATA，然后只取出来Data的值，也就是填写的内容
+    //                 data = JSON.parse(JSON.stringify(data));
+    //                 for (var i = 0; i < data.length; i++) {
+    //                     data[i] = JSON.parse(JSON.stringify(data[i].data));
+    //                     console.log(data[i]);
+    //                 }
+    //                 //console.log(typeof data);
+
+    //                 res.render('../views/questionaires/questionnaireResult', {
+    //                     title: "问卷结果",
+    //                     qID: qID,
+    //                     username: req.session.token.username,
+    //                     questionnaireTitle: questionnaireTitle,
+    //                     questionnaireDesc: questionnaireDesc,
+    //                     data: data
+    //                 });
+    //             }
+    //         });
+    //     }
+    // });
 });
 
 module.exports = router;
