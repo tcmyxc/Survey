@@ -55,6 +55,22 @@ exports.selectQuestionnaireByUsername = function(req, callback) {
 	}
 };
 
+exports.selectQuestionnaireByQID = function(req, callback) {
+	try {
+		var qID = req.query.qID;
+		var sql = "select * from questionnaire where id=?";
+		db.query(sql, qID, function(err, data) {
+		    if (err) {
+		        throw err;
+		    } else {
+		        callback(undefined, data);
+		    }
+		});
+	} catch (err) {
+	    callback(err);
+	}
+};
+
 //viewQuestionnaire
 exports.viewQuestionnaire = function(req, callback) {
 	try {
@@ -116,7 +132,7 @@ exports.checkUIp = function(req, callback) {
 exports.viewResult = function(req, callback) {
 	try {
 		var qID = req.query.qID;
-		var sql = 'select * from questionnaire as q1,q_data as q2 where q1.id=q2.q_id and q1.id=?';
+		var sql = 'select * from questionnaire as q1, q_data as q2 where q1.id=q2.q_id and q1.id=?';
 		db.query(sql, qID, function(err, data) {
 		    if (err) {
 		        throw err;

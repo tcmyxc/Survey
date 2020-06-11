@@ -551,6 +551,7 @@ router.get('/delQuestionnaire', userModule.loginRequired, function(req, res, nex
                                         console.log(err);
                                         return res.send('<script>alert("服务器故障，请稍后重试")</script>');
                                     } else {
+                                        req.session.token.qID = null;//删除之后需要销毁qID
                                         return res.send('<script>alert("删除成功！");window.location.href="/myQuestionnaire"</script>');
                                     }
                                 });
@@ -645,14 +646,24 @@ router.post('/questionnaires', function(req, res, next) {
 // 查看问卷填写结果
 router.get('/questionnaireResult', userModule.loginRequired, function(req, res, next) {
     var qID = req.query.qID;
+    var questionnaireTitle = null;
+    var questionnaireDesc = null;
+
+    questionModule.selectQuestionnaireByQID(req, function(err, data){
+        if (err) {
+            console.log(err);
+            return res.send('<script>alert("服务器故障")</script>');
+        } else {
+            questionnaireTitle = data[0].title;
+            questionnaireDesc = data[0].desc;
+        }
+    });
 
     questionModule.viewResult(req, function(err, data){
         if (err) {
             console.log(err);
             return res.send('<script>alert("服务器故障")</script>');
         } else {
-            var questionnaireTitle = data[0].title;
-            var questionnaireDesc = data[0].desc;
             // 先去除ROWDATA，然后只取出来Data的值，也就是填写的内容
             data = JSON.parse(JSON.stringify(data));
             for (var i = 0; i < data.length; i++) {

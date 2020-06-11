@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(session({
     secret: 'hello tcmyxc',
-    cookie: { maxAge: 30000 * 60 * 1000 }, //cookie生存周期30*60秒
+    cookie: { maxAge: 30 * 60 * 1000 }, //cookie生存周期30*60秒
     resave: true,  //cookie之间的请求规则,假设每次登陆，就算会话存在也重新保存一次
     saveUninitialized: true //强制保存未初始化的会话到存储器
 }));
