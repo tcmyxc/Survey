@@ -343,14 +343,14 @@ router.post('/createQuestionnaire', userModule.loginRequired, function(req, res,
 router.post('/addQuestion', userModule.loginRequired, function(req, res, next) {
     var qID = (req.query.qID) ? req.query.qID : req.session.token.qID;
     var qType = req.body.questionType;
-    var qMust = (req.body.questionMust == 'on') ? '1' : '0';
+    // var qMust = (req.body.questionMust == 'on') ? '1' : '0';
     var qDesc = req.body.subQuestionDesc;
 
     if (qType == "1" || qType == "3") {
         var qOptions = JSON.stringify(req.body.options);
         //console.log(qOptions);
-        var sql = "insert into questions (questionnaire_id, q_type, q_must, q_desc, q_options) values (?,?,?,?,?)";
-        db.query(sql, [qID, qType, qMust, qDesc, qOptions], function(err, data) {
+        var sql = "insert into questions (questionnaire_id, q_type, q_desc, q_options) values (?,?,?,?)";
+        db.query(sql, [qID, qType, qDesc, qOptions], function(err, data) {
             if (err) {
                 console.log(err);
                 return res.send('<script>alert("服务器故障，请稍后重试")</script>');
@@ -360,8 +360,8 @@ router.post('/addQuestion', userModule.loginRequired, function(req, res, next) {
         });
     } else if (qType == '2') {
         var qLevel = req.body.radioLevel;
-        var sql = "insert into questions (questionnaire_id, q_type, q_must, q_desc, q_level) values (?,?,?,?,?)";
-        db.query(sql, [qID, qType, qMust, qDesc, qLevel], function(err, data) {
+        var sql = "insert into questions (questionnaire_id, q_type, q_desc, q_level) values (?,?,?,?)";
+        db.query(sql, [qID, qType, qDesc, qLevel], function(err, data) {
             if (err) {
                 console.log(err);
                 return res.send('<script>alert("服务器故障，请稍后重试")</script>');
@@ -371,8 +371,8 @@ router.post('/addQuestion', userModule.loginRequired, function(req, res, next) {
         });
 
     } else if (qType == '4' || qType == '5') {
-        var sql = "insert into questions (questionnaire_id, q_type, q_must, q_desc) values (?,?,?,?)";
-        db.query(sql, [qID, qType, qMust, qDesc], function(err, data) {
+        var sql = "insert into questions (questionnaire_id, q_type, q_desc) values (?,?,?)";
+        db.query(sql, [qID, qType, qDesc], function(err, data) {
             if (err) {
                 console.log(err);
                 return res.send('<script>alert("服务器故障，请稍后重试")</script>');
@@ -390,6 +390,7 @@ router.post('/addQuestion', userModule.loginRequired, function(req, res, next) {
 router.get('/publishQuestionnaire', userModule.loginRequired, function(req, res, next) {
 
     // 将问卷状态设置为已发布，然后生成一个唯一码
+    //console.log(req.query.status == undefined);
     var qID = req.session.token.qID ? req.session.token.qID : req.query.qID;
     // var sql = "update questionnaire set status='1' where id=?";
     // db.query(sql, qID, function(err, data) {

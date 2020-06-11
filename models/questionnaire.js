@@ -24,7 +24,8 @@ exports.createQuestionnaire = function(req, callback) {
 exports.updateQuestionnaireStatusById = function(req, callback) {
 	try {
 		var qID = req.session.token.qID ? req.session.token.qID : req.query.qID;
-		var status = req.query.status ? req.query.status : 1;
+		var status = (req.query.status == undefined) ? 1 : req.query.status;
+		status = status.toString();//这里需要转为字符串
 		var sql = "update questionnaire set status=? where id=?";
 		db.query(sql, [status, qID], function(err, data) {
 		    if (err) {
